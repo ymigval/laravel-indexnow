@@ -1,0 +1,25 @@
+{
+    "name": "ymigval/laravel-indexnow",
+    "description": "Paquete para informar al instante a los motores de búsqueda sobre los últimos cambios de contenido en su sitio web con IndexNow.",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Yordan",
+            "email": "banatube@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Ymigval\\LaravelIndexnow\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ymigval\\LaravelIndexnow\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.9"
+    }
+}
