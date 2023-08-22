@@ -3,8 +3,7 @@
 namespace Ymigval\LaravelIndexnow\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
+use Ymigval\LaravelIndexnow\KeyIndexNow;
 
 class KeyGenerateCommand extends Command
 {
@@ -20,7 +19,7 @@ class KeyGenerateCommand extends Command
      *
      * @var string
      */
-    protected $description = "Crear una nueva clave de Index Now.";
+    protected $description = "Create an IndexNow key file.";
 
     /**
      * Create a new command instance.
@@ -39,25 +38,12 @@ class KeyGenerateCommand extends Command
      */
     public function handle(): int
     {
-        $key = $this->newkey();
+        $key = KeyIndexNow::newkey();
 
         $this->info('Key file generated and created successfully!');
+        $this->newLine();
         $this->line('Key:' . $key);
 
-        return 1;
-    }
-
-    /**
-     * Generate and create a new key file.
-     *
-     * @return string
-     */
-    private function newkey(): string
-    {
-        $key = Str::of(Str::uuid())->replace("-", "");
-
-        File::put(__DIR__ . "/../../storage/key.txt", $key);
-
-        return $key;
+        return self::SUCCESS;
     }
 }

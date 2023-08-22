@@ -9,7 +9,7 @@ class KeyFileDoesNotExistException extends Exception
     /**
      * @var string
      */
-    protected $message = "The key file does not exist. To create a new one, run the command: php artisan indexnow:newkey";
+    protected $message = "The IndexNow key file doesn't exist. To create one, use the command: artisan indexnow:newkey";
 
     /**
      * @var integer

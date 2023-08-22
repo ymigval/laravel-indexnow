@@ -3,7 +3,6 @@
 namespace Ymigval\LaravelIndexnow\Tests;
 
 use Orchestra\Testbench\TestCase as TestCaseBase;
-use Ymigval\LaravelIndexnow\Providers\ConsoleServiceProvider;
 use Ymigval\LaravelIndexnow\Providers\IndexNowServiceProvider;
 
 class TestCase extends TestCaseBase
@@ -19,7 +18,6 @@ class TestCase extends TestCaseBase
     {
         return [
             IndexNowServiceProvider::class,
-            ConsoleServiceProvider::class,
         ];
     }
 }

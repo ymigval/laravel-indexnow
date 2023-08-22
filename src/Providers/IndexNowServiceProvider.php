@@ -3,6 +3,7 @@
 namespace Ymigval\LaravelIndexnow\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Ymigval\LaravelIndexnow\Console\KeyGenerateCommand;
 use Ymigval\LaravelIndexnow\IndexNow;
 
 class IndexNowServiceProvider extends ServiceProvider
@@ -20,6 +21,14 @@ class IndexNowServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Commands
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                KeyGenerateCommand::class,
+            ]);
+        }
 
+        // Routes
+        $this->loadRoutesFrom(__DIR__ . '/../../routes/web.php');
     }
 }
