@@ -20,4 +20,15 @@ class TestCase extends TestCaseBase
             IndexNowServiceProvider::class,
         ];
     }
+
+    /**
+     * Define environment setup.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     * @return void
+     */
+    protected function defineEnvironment($app)
+    {
+        $app['config']->set('app.urls', 'https://www.deepl.com');
+    }
 }

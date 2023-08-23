@@ -13,7 +13,14 @@ class IndexNowServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(IndexNow::class, fn($app) => new IndexNow());
+        // Get and merge configuration
+        $this->mergeConfigFrom(
+            __DIR__ . '/../../config/laravel-indexnow.php', 'laravel-indexnow'
+        );
+
+        $this->app->singleton(IndexNow::class, function ($app) {
+            return new IndexNow(config('laravel-indexnow.driver', 'microsoft_bing'));
+        });
     }
 
     /**
