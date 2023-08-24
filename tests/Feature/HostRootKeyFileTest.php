@@ -12,8 +12,8 @@ class HostRootKeyFileTest extends TestCase
      */
     public function test_get_key_file()
     {
-        $response = $this->get('/8beab1b2db094033962e3adb13ab3989.txt');
+        $response = $this->get('/5750efebf7cf4fc5918b726d621c7820.txt');
         $response->assertOk();
-        $response->assertContent('8beab1b2db094033962e3adb13ab3989');
+        $response->assertContent('5750efebf7cf4fc5918b726d621c7820');
     }
 }

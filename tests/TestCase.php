@@ -29,6 +29,6 @@ class TestCase extends TestCaseBase
      */
     protected function defineEnvironment($app)
     {
-        $app['config']->set('app.urls', 'https://www.deepl.com');
+        $app['config']->set('app.urls', 'http://example.com/');
     }
 }

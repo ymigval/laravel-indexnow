@@ -4,20 +4,20 @@ namespace Ymigval\LaravelIndexnow\Tests\Feature;
 
 use Ymigval\LaravelIndexnow\Exceptions\InvalidKeyException;
 use Ymigval\LaravelIndexnow\Exceptions\KeyFileDoesNotExistException;
-use Ymigval\LaravelIndexnow\KeyIndexNow;
+use Ymigval\LaravelIndexnow\IndexNowApiKeyManager;
 use Ymigval\LaravelIndexnow\Tests\TestCase;
 
-class KeyIndexNowTest extends TestCase
+class IndexNowApiKeyTest extends TestCase
 {
 
-    public function test_new_key()
+    public function test_generate_new_key()
     {
-        $this->assertNotEmpty(KeyIndexNow::newkey());
+        $this->assertNotEmpty(IndexNowApiKeyManager::generateNewApiKey());
     }
 
     public function test_get_key()
     {
-        $this->assertNotEmpty(KeyIndexNow::getKey());
+        $this->assertNotEmpty(IndexNowApiKeyManager::getApiKey());
     }
 
     /**
@@ -27,10 +27,10 @@ class KeyIndexNowTest extends TestCase
     {
 
         $this->expectException(KeyFileDoesNotExistException::class);
-        $this->expectExceptionMessage("The IndexNow key file doesn't exist. To create one, use the command: php artisan indexnow:newkey");
+        $this->expectExceptionMessage("The IndexNow key file does not exist. To create one, use the command: php artisan indexnow:generate-key");
         $this->expectExceptionCode(404);
 
-        KeyIndexNow::getKey();
+        IndexNowApiKeyManager::getApiKey();
     }
 
     /**
@@ -40,9 +40,9 @@ class KeyIndexNowTest extends TestCase
     {
 
         $this->expectException(InvalidKeyException::class);
-        $this->expectExceptionMessage("Your IndexNow key is not valid. To create a new one, use the command: php artisan indexnow:newkey");
+        $this->expectExceptionMessage("Your IndexNow key is invalid. To create a new one, use the command: php artisan indexnow:generate-key");
         $this->expectExceptionCode(404);
 
-        KeyIndexNow::getKey();
+        IndexNowApiKeyManager::getApiKey();
     }
 }

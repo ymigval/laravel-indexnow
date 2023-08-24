@@ -3,8 +3,8 @@
 namespace Ymigval\LaravelIndexnow\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Ymigval\LaravelIndexnow\Console\KeyGenerateCommand;
-use Ymigval\LaravelIndexnow\IndexNow;
+use Ymigval\LaravelIndexnow\Console\GenerateIndexNowApiKeyCommand;
+use Ymigval\LaravelIndexnow\IndexNowService;
 
 class IndexNowServiceProvider extends ServiceProvider
 {
@@ -18,8 +18,8 @@ class IndexNowServiceProvider extends ServiceProvider
             __DIR__ . '/../../config/laravel-indexnow.php', 'laravel-indexnow'
         );
 
-        $this->app->singleton(IndexNow::class, function ($app) {
-            return new IndexNow(config('laravel-indexnow.driver', 'microsoft_bing'));
+        $this->app->singleton(IndexNowService::class, function ($app) {
+            return new IndexNowService(config('laravel-indexnow.searchengine', 'microsoft_bing'));
         });
     }
 
@@ -31,7 +31,7 @@ class IndexNowServiceProvider extends ServiceProvider
         // Commands
         if ($this->app->runningInConsole()) {
             $this->commands([
-                KeyGenerateCommand::class,
+                GenerateIndexNowApiKeyCommand::class,
             ]);
         }
 

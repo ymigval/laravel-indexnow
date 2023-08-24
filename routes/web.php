@@ -2,12 +2,10 @@
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
-use Ymigval\LaravelIndexnow\IndexNow;
-
-$indexNow = $this->app->make(IndexNow::class);
+use Ymigval\LaravelIndexnow\IndexNowApiKeyManager;
 
 try {
-    $key = $indexNow->getKey();
+    $key = IndexNowApiKeyManager::getApiKey();
 
     Route::any(Str::of('/')->append($key)->append('.txt'), function () use ($key) {
         return new Response($key, 200, [
