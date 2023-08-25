@@ -18,11 +18,11 @@ class IndexNowServiceProvider extends ServiceProvider
     {
         // Get and merge configuration
         $this->mergeConfigFrom(
-            __DIR__ . '/../../config/laravel-indexnow.php', 'laravel-indexnow'
+            __DIR__ . '/../../config/indexnow.php', 'indexnow'
         );
 
         $this->app->singleton('IndexNow', function ($app) {
-            return new IndexNowService(config('laravel-indexnow.searchengine', 'microsoft_bing'));
+            return new IndexNowService(config('indexnow.searchengine', 'microsoft_bing'));
         });
     }
 
@@ -45,7 +45,7 @@ class IndexNowServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/../../routes/web.php');
 
         $this->publishes([
-            __DIR__ . '/../../config/laravel-indexnow.php' => config_path('/laravel-indexnow.php'),
-        ], 'laravel-indexnow');
+            __DIR__ . '/../../config/indexnow.php' => config_path('/indexnow.php'),
+        ], 'indexnow');
     }
 }

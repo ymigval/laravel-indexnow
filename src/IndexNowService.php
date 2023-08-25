@@ -2,12 +2,16 @@
 
 namespace Ymigval\LaravelIndexnow;
 
+use Exception;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Ymigval\LaravelIndexnow\Exceptions\ExcessUrlsException;
 use Ymigval\LaravelIndexnow\Exceptions\InvalidKeyException;
 use Ymigval\LaravelIndexnow\Exceptions\KeyFileDoesNotExistException;
+use Ymigval\LaravelIndexnow\Exceptions\MixedException;
+use Ymigval\LaravelIndexnow\Exceptions\NonAbsoluteUrlException;
 use Ymigval\LaravelIndexnow\Exceptions\SearchEngineUnknownException;
 
 class IndexNowService
@@ -59,18 +63,30 @@ class IndexNowService
     }
 
     /**
-     * Set URLs for indexing.
+     * Get the IndexNow API key.
      *
-     * @param  string|array $url
+     * @return string
+     * @throws KeyFileDoesNotExistException | InvalidKeyException
+     */
+    public function getKey(): string
+    {
+        // If you don't have an API Key, generate a new one.
+        try {
+            return IndexNowApiKeyManager::getApiKey();
+        } catch (Exception $e) {
+            return IndexNowApiKeyManager::generateNewApiKey();
+        }
+    }
+
+    /**
+     * Set URL for indexing.
+     *
+     * @param  string $url
      * @return $this
      */
-    public function setUrls($url): IndexNowService
+    public function setUrl(string $url): IndexNowService
     {
-        if (is_array($url)) {
-            $this->urls = array_merge($this->urls, $url);
-        } else {
-            $this->urls[] = $url;
-        }
+        $this->urls[] = $url;
 
         return $this;
     }
@@ -83,17 +99,6 @@ class IndexNowService
     public function getUrls(): array
     {
         return array_values(array_unique($this->urls));
-    }
-
-    /**
-     * Get the IndexNow API key.
-     *
-     * @return string
-     * @throws KeyFileDoesNotExistException | InvalidKeyException
-     */
-    public function getKey(): string
-    {
-        return IndexNowApiKeyManager::getApiKey();
     }
 
     /**
@@ -116,27 +121,49 @@ class IndexNowService
     }
 
     /**
+     * Set URLs for indexing.
+     *
+     * @param  string|array $url
+     * @return void
+     */
+    private function setUrls($url): void
+    {
+        if (is_array($url)) {
+            $this->urls = array_merge($this->urls, $url);
+        } else {
+            $this->urls[] = $url;
+        }
+    }
+
+    /**
      * Parse and prepare URLs for indexing.
      *
      * @return void
-     * @throws ExcessUrlsException
+     * @throws ExcessUrlsException | NonAbsoluteUrlException
      */
     private function parseUrls(): void
     {
-        $urlApp = Str::of(Config::get('app.urls'))
+        $urlApp = Str::of(Config::get('app.url'))
             ->replaceMatches('#/*$#', '');
 
         if (count($this->urls) > 10000) {
             throw new ExcessUrlsException();
         }
 
-        $this->urls = array_map(function ($url) use ($urlApp) {
+        foreach ($this->urls as $index => $url) {
+            // Si la url no tiene un host se considera que es relactiva
+            // Trata de convertirla en absoluta concatenandola con la url base (dominio) de la aplicacion
             if (is_null(parse_url($url, PHP_URL_HOST))) {
                 $url = Str::of($urlApp)->append($url);
             }
 
-            return $url;
-        }, $this->urls);
+            // Verificar si la url es abosula
+            if (is_null(parse_url($url, PHP_URL_HOST))) {
+                throw new NonAbsoluteUrlException();
+            }
+
+            $this->urls[$index] = $url;
+        }
 
         if (count($this->urls) == 1) {
             $this->urls[0] = rawurlencode($this->urls[0]);
@@ -171,8 +198,9 @@ class IndexNowService
      */
     private function process()
     {
-        if (Config::get('laravel-indexnow.enable_request') !== true) {
-            return 'Sending requests to IndexNow is currently disabled. To enable request sending, set the "enable_request" property to true in your configuration. If you do not have the package configuration file, install it using the following command: php artisan vendor:publish --tag=laravel-indexnow';
+
+        if (Config::get('indexnow.ignore_production_environment') !== true && App::isProduction() == false) {
+            return 'Sending requests to IndexNow is currently disabled in the local environment. To enable request sending in any environment, set the property "ignore_production_environment" to true in the configuration file. If you do not have the package configuration file, you can install it using the following command: php artisan vendor:publish --tag="indexnow"';
         }
 
         if (PreventSpan::isAllowed() == false) {
@@ -186,19 +214,27 @@ class IndexNowService
 
         $response = null;
 
-        if (count($this->getUrls()) > 1) {
-            $data            = [];
-            $data['host']    = $this->getHost();
-            $data['key']     = $this->getKey();
-            $data['urlList'] = $this->getUrls();
-            $response        = Http::post($endpoint, $data);
-        } else if (count($this->getUrls()) == 1) {
-            $endpoint = $endpoint->replace("<searchengine>", $this->getSearchEngine())
-                ->replace("<url-changed>", $this->getUrls()[0])
-                ->replace("<your-key>", $this->getKey());
-            $response = Http::get($endpoint);
-        } else {
-            return 'No URLs provided for indexing.';
+        try {
+            if (count($this->getUrls()) > 1) {
+                $data            = [];
+                $data['host']    = $this->getHost();
+                $data['key']     = $this->getKey();
+                $data['urlList'] = $this->getUrls();
+
+                $response = Http::post($endpoint, $data);
+
+            } else if (count($this->getUrls()) == 1) {
+                $endpoint = $endpoint->replace("<searchengine>", $this->getSearchEngine())
+                    ->replace("<url-changed>", $this->getUrls()[0])
+                    ->replace("<your-key>", $this->getKey());
+
+                $response = Http::get($endpoint);
+
+            } else {
+                return 'No URLs provided for indexing.';
+            }
+        } catch (Exception $e) {
+            throw new MixedException($e->getMessage(), $e->getCode());
         }
 
         PreventSpan::detectPotentialSpam($response);

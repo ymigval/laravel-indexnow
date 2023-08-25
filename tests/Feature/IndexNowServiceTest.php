@@ -11,9 +11,9 @@ class IndexNowServiceTest extends TestCase
     public function test_submit_multi_url()
     {
         $indexNow = $this->app->make('IndexNow');
-        $indexNow->setUrls('/new');
-        $indexNow->setUrls('http://example.com/super-mario');
-        $indexNow->setUrls('/nintendo');
+        $indexNow->setUrl('/new');
+        $indexNow->setUrl('http://example.com/super-mario');
+        $indexNow->setUrl('/nintendo');
         $status = $indexNow->submit();
 
         $this->assertIsArray($status);

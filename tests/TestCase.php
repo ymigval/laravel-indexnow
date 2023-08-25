@@ -27,8 +27,9 @@ class TestCase extends TestCaseBase
      * @param  \Illuminate\Foundation\Application  $app
      * @return void
      */
-    protected function defineEnvironment($app)
+    protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.urls', 'http://example.com/');
+        $app['config']->set('app.url', 'http://example.com/');
+        $app['config']->set('indexnow.ignore_production_environment', true);
     }
 }

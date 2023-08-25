@@ -1,10 +1,21 @@
 {
     "name": "ymigval/laravel-indexnow",
     "type": "library",
-    "description": "Service library to notify search engines about the latest content changes on your URLs using IndexNow.",
-    "homepage": "https://github.com/dflydev/dflydev-dot-access-data",
-    "keywords": ["indexnow", "searchengine", "website", "seo", "search", "bing", "yandex", "laravel"],
+    "description": "Laravel Service Library for notifying search engines about the latest content changes on their URLs using IndexNow.",
+    "homepage": "https://github.com/ymigval/laravel-indexnow",
+    "keywords": [
+        "indexnow", 
+        "search engine", 
+        "website", 
+        "seo", 
+        "search", 
+        "bing", 
+        "yandex", 
+        "laravel"
+    ],
     "license": "MIT",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "authors": [
         {
             "name": "Yordan",
@@ -20,6 +31,9 @@
         "psr-4": {
             "Ymigval\\LaravelIndexnow\\Tests\\": "tests/"
         }
+    },
+    "require": {
+        "php": "^7.4 || ^8.0"
     },
     "require-dev": {
         "orchestra/testbench": "^8.9",
