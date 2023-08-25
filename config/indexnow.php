@@ -3,24 +3,25 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | Available Search Engines
+    | Search Engine Configuration
     |--------------------------------------------------------------------------
     |
+    | Choose the preferred search engine for indexing:
     | Options: indexnow, microsoft_bing, naver, seznam, yandex
     |
     | Default: microsoft_bing
     |
     */
    
-    'searchengine'   => 'microsoft_bing',
+    'search_engine'   => 'microsoft_bing',
 
     /*
     |--------------------------------------------------------------------------
-    | Logging
+    | Logging Configuration
     |--------------------------------------------------------------------------
     |
     | Enable or disable IndexNow logging.
-    | Logs are automatically cleared after a certain point, retaining only the latest records.
+    | Logs are automatically cleared after a certain period, retaining only the latest records.
     |
     | Default: Logging is enabled
     |
@@ -29,12 +30,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Control
+    | Production Environment Control
     |--------------------------------------------------------------------------
     |
-    | Sending requests to IndexNow is disabled by default.
-    | To enable request sending, set the property to 'production'.
+    | By default, in a local environment, requests to IndexNow will not be sent.
+    | If you want to force sending requests in a local environment, disable this restriction by setting the property to true.
     |
     */
-    'enable_request' => env('INDEXNOW_ENABLE', false)
+    'ignore_production_environment' => env('INDEXNOW_IGNORE_PRODUCTION_ENVIRONMENT', false)
 ];

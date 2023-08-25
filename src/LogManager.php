@@ -58,7 +58,7 @@ class LogManager
      */
     private static function writeLog($message): string
     {
-        if (Config::get('laravel-indexnow.enable_logging') === false) {
+        if (Config::get('indexnow.enable_logging') === false) {
             return 'logging is disabled';
         }
 
