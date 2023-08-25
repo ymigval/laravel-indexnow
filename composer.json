@@ -1,8 +1,10 @@
 {
     "name": "ymigval/laravel-indexnow",
-    "description": "Paquete para informar al instante a los motores de búsqueda sobre los últimos cambios de contenido en su sitio web con IndexNow.",
-    "license": "MIT",
     "type": "library",
+    "description": "Service library to notify search engines about the latest content changes on your URLs using IndexNow.",
+    "homepage": "https://github.com/dflydev/dflydev-dot-access-data",
+    "keywords": ["indexnow", "searchengine", "website", "seo", "search", "bing", "yandex", "laravel"],
+    "license": "MIT",
     "authors": [
         {
             "name": "Yordan",
@@ -22,5 +24,15 @@
     "require-dev": {
         "orchestra/testbench": "^8.9",
         "guzzlehttp/guzzle": "^7.7"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Ymigval\\LaravelIndexnow\\Providers\\IndexNowServiceProvider"
+            ],
+            "aliases": {
+                "Debugbar": "Ymigval\\LaravelIndexnow\\Facade\\IndexNow"
+            }
+        }
     }
 }

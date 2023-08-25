@@ -3,7 +3,6 @@
 namespace Ymigval\LaravelIndexnow\Tests\Feature;
 
 use Ymigval\LaravelIndexnow\Exceptions\SearchEngineUnknownException;
-use Ymigval\LaravelIndexnow\IndexNowService;
 use Ymigval\LaravelIndexnow\Tests\TestCase;
 
 class IndexNowServiceTest extends TestCase
@@ -11,7 +10,7 @@ class IndexNowServiceTest extends TestCase
 
     public function test_submit_multi_url()
     {
-        $indexNow = $this->app->make(IndexNowService::class);
+        $indexNow = $this->app->make('IndexNow');
         $indexNow->setUrls('/new');
         $indexNow->setUrls('http://example.com/super-mario');
         $indexNow->setUrls('/nintendo');
@@ -23,7 +22,7 @@ class IndexNowServiceTest extends TestCase
 
     public function test_submit_one_url()
     {
-        $indexNow = $this->app->make(IndexNowService::class);
+        $indexNow = $this->app->make('IndexNow');
 
         $status = $indexNow->submit('/cat');
 
@@ -33,14 +32,14 @@ class IndexNowServiceTest extends TestCase
 
     public function test_submit_no_urls()
     {
-        $indexNow = $this->app->make(IndexNowService::class);
+        $indexNow = $this->app->make('IndexNow');
         $status   = $indexNow->submit();
         $this->assertEquals($status, 'No URLs provided for indexing.');
     }
 
     public function test_submit_no_is_allowed()
     {
-        $indexNow = $this->app->make(IndexNowService::class);
+        $indexNow = $this->app->make('IndexNow');
         $status   = $indexNow->submit('/test');
         $this->assertEquals($status, 'The use of IndexNow has been temporarily blocked to prevent potential spam.');
     }
@@ -54,7 +53,7 @@ class IndexNowServiceTest extends TestCase
         $this->expectExceptionMessage("Unknown search engine driver for IndexNow.");
         $this->expectExceptionCode(404);
 
-        $indexNow = $this->app->make(IndexNowService::class);
+        $indexNow = $this->app->make('IndexNow');
         $indexNow->setDriver('unknown_driver');
     }
 }

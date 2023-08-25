@@ -55,7 +55,7 @@ class IndexNowService
      */
     public function getSearchEngine(): string
     {
-        return $this->searchengine;
+        return (string) $this->searchengine;
     }
 
     /**
@@ -171,8 +171,8 @@ class IndexNowService
      */
     private function process()
     {
-        if(Config::get('laravel-indexnow.production') == false) {
-            return 'Everything is set up correctly to work perfectly when the application is in production.';
+        if (Config::get('laravel-indexnow.enable_request') !== true) {
+            return 'Sending requests to IndexNow is currently disabled. To enable request sending, set the "enable_request" property to true in your configuration. If you do not have the package configuration file, install it using the following command: php artisan vendor:publish --tag=laravel-indexnow';
         }
 
         if (PreventSpan::isAllowed() == false) {
