@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Ymigval\LaravelIndexnow\Exceptions\ExcessUrlsException;
-use Ymigval\LaravelIndexnow\Exceptions\InvalidKeyException;
-use Ymigval\LaravelIndexnow\Exceptions\KeyFileDoesNotExistException;
 use Ymigval\LaravelIndexnow\Exceptions\MixedException;
 use Ymigval\LaravelIndexnow\Exceptions\NonAbsoluteUrlException;
 use Ymigval\LaravelIndexnow\Exceptions\SearchEngineUnknownException;
@@ -66,16 +64,10 @@ class IndexNowService
      * Get the IndexNow API key.
      *
      * @return string
-     * @throws KeyFileDoesNotExistException | InvalidKeyException
      */
     public function getKey(): string
     {
-        // If you don't have an API Key, generate a new one.
-        try {
-            return IndexNowApiKeyManager::getApiKey();
-        } catch (Exception $e) {
-            return IndexNowApiKeyManager::generateNewApiKey();
-        }
+        return IndexNowApiKeyManager::getApiKey();
     }
 
     /**

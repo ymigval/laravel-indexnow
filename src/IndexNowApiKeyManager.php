@@ -2,6 +2,7 @@
 
 namespace Ymigval\LaravelIndexnow;
 
+use Exception;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Ymigval\LaravelIndexnow\Exceptions\InvalidKeyException;
@@ -21,22 +22,26 @@ class IndexNowApiKeyManager
      * Get the IndexNow API key.
      *
      * @return string
-     * @throws KeyFileDoesNotExistException | InvalidKeyException
      */
     public static function getApiKey()
     {
-        if (File::exists(static::$apiKeyFilePath) == false) {
-            throw new KeyFileDoesNotExistException();
+        try {
+            if (File::exists(static::$apiKeyFilePath) == false) {
+                throw new KeyFileDoesNotExistException();
+            }
+
+            $apiKey       = File::get(static::$apiKeyFilePath);
+            $apiKeyLength = strlen($apiKey);
+
+            if ($apiKeyLength < 8 || $apiKeyLength > 128) {
+                throw new InvalidKeyException();
+            }
+
+            return $apiKey;
+        } catch (Exception $e) {
+            // If you don't have an API Key, generate a new one.
+            return IndexNowApiKeyManager::generateNewApiKey();
         }
-
-        $apiKey = File::get(static::$apiKeyFilePath);
-        $apiKeyLength = strlen($apiKey);
-
-        if ($apiKeyLength < 8 || $apiKeyLength > 128) {
-            throw new InvalidKeyException();
-        }
-
-        return $apiKey;
     }
 
     /**
