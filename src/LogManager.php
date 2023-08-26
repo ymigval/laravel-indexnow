@@ -72,9 +72,9 @@ class LogManager
         $logEntry = Str::of(date(DateTimeInterface::W3C))
             ->append(' > ')
             ->append(json_encode($message, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES))
-            ->newLine(1);
+            ->append(PHP_EOL);
 
-        File::prepend(static::$logFilePath, $logEntry);
+        File::append(static::$logFilePath, $logEntry);
 
         return $logEntry;
     }
