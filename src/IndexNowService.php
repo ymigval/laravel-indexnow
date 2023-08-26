@@ -164,10 +164,6 @@ class IndexNowService
 
             $this->urls[$index] = $url;
         }
-
-        if (count($this->urls) == 1) {
-            $this->urls[0] = rawurlencode($this->urls[0]);
-        }
     }
 
     /**
@@ -211,7 +207,6 @@ class IndexNowService
 
         $endpoint = Str::of("https://<searchengine>/indexnow")
             ->replace("<searchengine>", $this->getSearchEngine());
-
         $response = null;
 
         try {
@@ -222,14 +217,12 @@ class IndexNowService
                 $data['urlList'] = $this->getUrls();
 
                 $response = Http::post($endpoint, $data);
-
             } else if (count($this->getUrls()) == 1) {
-                $endpoint = $endpoint->replace("<searchengine>", $this->getSearchEngine())
-                    ->replace("<url-changed>", $this->getUrls()[0])
-                    ->replace("<your-key>", $this->getKey());
+                $endpoint = Str::of($endpoint)
+                    ->append('?')
+                    ->append(http_build_query(['url' => $this->getUrls()[0], 'key' => $this->getKey()]));
 
                 $response = Http::get($endpoint);
-
             } else {
                 return 'No URLs provided for indexing.';
             }
@@ -243,7 +236,7 @@ class IndexNowService
             'searchengine' => $this->getSearchEngine(),
             'status'       => $response->status(),
             'info'         => $response->reason(),
-            'urls'         => (count($this->getUrls()) == 1) ? rawurldecode($this->getUrls()[0]) : $this->getUrls(),
+            'urls'         => $this->getUrls(),
         ];
     }
 }
