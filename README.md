@@ -27,6 +27,40 @@ You can publish the configuration file using the following command:
 php artisan vendor:publish --tag="indexnow"
 ```
 
+### IndexNow API Key
+
+The IndexNow API requires a request key, which should match a key file within the host domain. Fortunately, this step is automated for you.
+
+If you want to generate a new key and key file, use the following Artisan command:
+
+```bash
+php artisan indexnow:generate-key
+```
+
+
+#### Verifying Your Key File
+
+Place the API key code at the root of your domain and append the `.txt` extension to it.
+
+Example:
+
+https://www.example.com/4cea016a4ddb408592569456a9c4896b.txt
+
+
+To find out your IndexNow API key, use the following Artisan command:
+
+
+```bash
+php artisan indexnow:apikey
+```
+
+If the route doesn't work, clear the route cache:
+
+
+```bash
+php artisan route:clear
+php artisan route:cache
+```
 
 
 ## Usage
@@ -57,17 +91,6 @@ IndexNow::setUrl('https://example.com/cute-cats')
         ->setUrl('https://example.com/dog-love')
         ->setUrl('https://example.com/nature')
         ->submit();
-```
-
-
-### IndexNow API Key
-
-The IndexNow API requires a request key, which should match a key file within the host domain. Fortunately, this step is automated for you.
-
-If you want to generate a new key and key file, use the following Artisan command:
-
-```bash
-php artisan indexnow:generate-key
 ```
 
 

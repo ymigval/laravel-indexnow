@@ -211,7 +211,6 @@ class IndexNowService
 
         $endpoint = Str::of("https://<searchengine>/indexnow")
             ->replace("<searchengine>", $this->getSearchEngine());
-
         $response = null;
 
         try {
@@ -222,14 +221,12 @@ class IndexNowService
                 $data['urlList'] = $this->getUrls();
 
                 $response = Http::post($endpoint, $data);
-
             } else if (count($this->getUrls()) == 1) {
-                $endpoint = $endpoint->replace("<searchengine>", $this->getSearchEngine())
-                    ->replace("<url-changed>", $this->getUrls()[0])
-                    ->replace("<your-key>", $this->getKey());
+                $endpoint = Str::of($endpoint)
+                    ->append('?')
+                    ->append(http_build_query(['url' => $this->getUrls()[0], 'key' => $this->getKey()]));
 
                 $response = Http::get($endpoint);
-
             } else {
                 return 'No URLs provided for indexing.';
             }
