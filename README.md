@@ -15,7 +15,7 @@ This package provides a simple mechanism to notify IndexNow about changes to you
 You can install the package via Composer:
 
 ```bash
-composer require laravel-indexnow
+composer require ymigval/laravel-indexnow
 ```
 
 
