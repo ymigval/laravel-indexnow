@@ -67,8 +67,8 @@ php artisan route:cache
 You can also host text key files in other locations within the same host and send it with the page submission.
 
 ```php
-IndexNow::keyFile('http://localhost/keys/8bbf5df8bbaa457aab35bb3ccbb99aec.txt')
-    ->submit('https://example.com/cute-cats');
+IndexNow::keyFile('https://www.example.com/keys/8bbf5df8bbaa457aab35bb3ccbb99aec.txt')
+    ->submit('https://www.example.com/cute-cats');
 ```
 
 Services where you can generate and download a text key file:
@@ -85,7 +85,7 @@ You can submit one or more pages per request by calling the facade and passing t
 ```php
 use Ymigval\LaravelIndexnow\Facade\IndexNow;
 
-IndexNow::submit('https://example.com/cute-cats');
+IndexNow::submit('https://www.example.com/cute-cats');
 ```
 
 ### Submit multiple pages
@@ -95,16 +95,16 @@ To submit multiple pages at once, provide an array of URLs.
 use Ymigval\LaravelIndexnow\Facade\IndexNow;
 
 IndexNow::submit([
-    'https://example.com/cute-cats',
-    'https://example.com/dog-love',
-    'https://example.com/nature',
+    'https://www.example.com/cute-cats',
+    'https://www.example.com/dog-love',
+    'https://www.example.com/nature',
 ]);
 
 // Or using method chaining
 
-IndexNow::setUrl('https://example.com/cute-cats')
-        ->setUrl('https://example.com/dog-love')
-        ->setUrl('https://example.com/nature')
+IndexNow::setUrl('https://www.example.com/cute-cats')
+        ->setUrl('https://www.example.com/dog-love')
+        ->setUrl('https://www.example.com/nature')
         ->submit();
 ```
 
