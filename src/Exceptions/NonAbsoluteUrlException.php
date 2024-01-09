@@ -10,7 +10,7 @@ class NonAbsoluteUrlException extends Exception
     /**
      * @var string
      */
-    protected $message = "Relative URLs detected. URLs submitted to IndexNow must be absolute or complete URLs.";
+    protected $message = 'Relative URLs detected. URLs submitted to IndexNow must be absolute or complete URLs.';
 
     /**
      * @var int

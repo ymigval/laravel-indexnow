@@ -8,7 +8,6 @@ use Ymigval\LaravelIndexnow\Tests\TestCase;
 
 class PreventSpanTest extends TestCase
 {
-
     /**
      * @test
      */
@@ -22,7 +21,7 @@ class PreventSpanTest extends TestCase
 
         PreventSpan::detectPotentialSpam($response);
 
-        $this->assertFileExists("storage/temporary_blocking.txt");
+        $this->assertFileExists('storage/temporary_blocking.txt');
     }
 
     /**
@@ -37,7 +36,7 @@ class PreventSpanTest extends TestCase
         $response = Http::get('/api-endpoint');
         PreventSpan::detectPotentialSpam($response);
 
-        $this->assertFileDoesNotExist("storage/temporary_blocking.txt");
+        $this->assertFileDoesNotExist('storage/temporary_blocking.txt');
     }
 
     /**

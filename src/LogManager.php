@@ -14,7 +14,7 @@ class LogManager
      *
      * @var string
      */
-    private static $logFilePath = __DIR__ . "/../storage/log.txt";
+    private static $logFilePath = __DIR__.'/../storage/log.txt';
 
     /**
      * Show logs.
@@ -32,8 +32,8 @@ class LogManager
 
     /**
      * Add log entry.
-     * @param  mixed $message
-     * @return void
+     *
+     * @param  mixed  $message
      */
     public static function addLog($message): void
     {
@@ -42,8 +42,6 @@ class LogManager
 
     /**
      * Delete the log file.
-     *
-     * @return bool
      */
     public static function deleteLogFile(): bool
     {
@@ -53,8 +51,7 @@ class LogManager
     /**
      * Write to the log file.
      *
-     * @param  mixed $message
-     * @return string
+     * @param  mixed  $message
      */
     private static function writeLog($message): string
     {

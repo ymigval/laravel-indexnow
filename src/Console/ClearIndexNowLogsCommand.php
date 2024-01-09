@@ -12,24 +12,23 @@ class ClearIndexNowLogsCommand extends Command
      *
      * @var string
      */
-    protected $signature = "indexnow:clear-logs";
+    protected $signature = 'indexnow:clear-logs';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = "Clear IndexNow logs";
+    protected $description = 'Clear IndexNow logs';
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle(): int
     {
         LogManager::deleteLogFile();
         $this->info('IndexNow logs have been successfully cleared.');
+
         return self::SUCCESS;
     }
 }

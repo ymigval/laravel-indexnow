@@ -2,7 +2,12 @@
 
 All notable changes to `ymigval/laravel-indexnow` will be documented in this file.
 
-## 1.0 - 2023-08-25
+## 1.1.0 - 2024-01-08
+
+- You can host one to several text key files in other locations within the same host.
+- Simplified internal key generator
+
+## 1.0.0 - 2023-08-25
 
 - Initial release of `ymigval/laravel-indexnow`.
 - Added functionality to notify IndexNow about changes in URLs.

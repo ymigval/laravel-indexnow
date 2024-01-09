@@ -13,14 +13,14 @@ class GetIndexNowApiKeyCommand extends Command
      *
      * @var string
      */
-    protected $signature = "indexnow:apikey";
+    protected $signature = 'indexnow:apikey';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = "Retrieve my IndexNow API Key";
+    protected $description = 'Retrieve my IndexNow API Key';
 
     /**
      * Create a new command instance.
@@ -34,19 +34,18 @@ class GetIndexNowApiKeyCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle(): int
     {
         try {
             $key = IndexNowApiKeyManager::getApiKey();
 
-            $this->line('API Key: ' . $key);
+            $this->line('API Key: '.$key);
 
             return self::SUCCESS;
         } catch (Exception $e) {
             $this->error($e->getMessage());
+
             return self::FAILURE;
         }
     }

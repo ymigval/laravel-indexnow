@@ -12,8 +12,8 @@ return [
     | Default: microsoft_bing
     |
     */
-   
-    'search_engine'   => 'microsoft_bing',
+
+    'search_engine' => 'microsoft_bing',
 
     /*
     |--------------------------------------------------------------------------
@@ -37,5 +37,5 @@ return [
     | If you want to force sending requests in a local environment, disable this restriction by setting the property to true.
     |
     */
-    'ignore_production_environment' => env('INDEXNOW_IGNORE_PRODUCTION_ENVIRONMENT', false)
+    'ignore_production_environment' => env('INDEXNOW_IGNORE_PRODUCTION_ENVIRONMENT', false),
 ];

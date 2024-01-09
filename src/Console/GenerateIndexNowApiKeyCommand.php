@@ -12,14 +12,14 @@ class GenerateIndexNowApiKeyCommand extends Command
      *
      * @var string
      */
-    protected $signature = "indexnow:generate-key";
+    protected $signature = 'indexnow:generate-key';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = "Generate a new IndexNow API key.";
+    protected $description = 'Generate a new IndexNow API key.';
 
     /**
      * Create a new command instance.
@@ -33,8 +33,6 @@ class GenerateIndexNowApiKeyCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle(): int
     {
@@ -42,7 +40,7 @@ class GenerateIndexNowApiKeyCommand extends Command
 
         $this->info('New IndexNow API key generated and saved successfully!');
         $this->newLine();
-        $this->line('API Key: ' . $apiKey);
+        $this->line('API Key: '.$apiKey);
 
         return self::SUCCESS;
     }

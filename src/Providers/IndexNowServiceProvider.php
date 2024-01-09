@@ -18,7 +18,7 @@ class IndexNowServiceProvider extends ServiceProvider
     {
         // Get and merge configuration
         $this->mergeConfigFrom(
-            __DIR__ . '/../../config/indexnow.php', 'indexnow'
+            __DIR__.'/../../config/indexnow.php', 'indexnow'
         );
 
         $this->app->singleton('IndexNow', function ($app) {
@@ -42,10 +42,10 @@ class IndexNowServiceProvider extends ServiceProvider
         }
 
         // Routes
-        $this->loadRoutesFrom(__DIR__ . '/../../routes/web.php');
+        $this->loadRoutesFrom(__DIR__.'/../../routes/web.php');
 
         $this->publishes([
-            __DIR__ . '/../../config/indexnow.php' => config_path('/indexnow.php'),
+            __DIR__.'/../../config/indexnow.php' => config_path('/indexnow.php'),
         ], 'indexnow');
     }
 }

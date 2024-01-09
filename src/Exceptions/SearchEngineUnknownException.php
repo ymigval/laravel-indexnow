@@ -10,7 +10,7 @@ class SearchEngineUnknownException extends Exception
     /**
      * @var string
      */
-    protected $message = "Unknown search engine driver for IndexNow.";
+    protected $message = 'Unknown search engine driver for IndexNow.';
 
     /**
      * @var int

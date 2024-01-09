@@ -10,13 +10,12 @@ use Ymigval\LaravelIndexnow\Exceptions\KeyFileDoesNotExistException;
 
 class IndexNowApiKeyManager
 {
-
     /**
      * Path to the IndexNow API key file.
      *
      * @var string
      */
-    private static $apiKeyFilePath = __DIR__ . "/../storage/indexnow_api_key.txt";
+    private static $apiKeyFilePath = __DIR__.'/../storage/indexnow_api_key.txt';
 
     /**
      * Get the IndexNow API key.
@@ -30,7 +29,7 @@ class IndexNowApiKeyManager
                 throw new KeyFileDoesNotExistException();
             }
 
-            $apiKey       = File::get(static::$apiKeyFilePath);
+            $apiKey = File::get(static::$apiKeyFilePath);
             $apiKeyLength = strlen($apiKey);
 
             if ($apiKeyLength < 8 || $apiKeyLength > 128) {
@@ -46,12 +45,12 @@ class IndexNowApiKeyManager
 
     /**
      * Generate and create a new IndexNow API key file.
-     *
-     * @return string
      */
     public static function generateNewApiKey(): string
     {
-        $apiKey = Str::of(Str::uuid())->replace("-", "");
+        $apiKey = Str::uuid()
+            ->getHex()
+            ->toString();
 
         File::put(static::$apiKeyFilePath, $apiKey);
 

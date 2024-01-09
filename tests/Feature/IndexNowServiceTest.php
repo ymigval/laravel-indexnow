@@ -7,7 +7,6 @@ use Ymigval\LaravelIndexnow\Tests\TestCase;
 
 class IndexNowServiceTest extends TestCase
 {
-
     public function test_submit_multi_url()
     {
         $indexNow = $this->app->make('IndexNow');
@@ -33,14 +32,14 @@ class IndexNowServiceTest extends TestCase
     public function test_submit_no_urls()
     {
         $indexNow = $this->app->make('IndexNow');
-        $status   = $indexNow->submit();
+        $status = $indexNow->submit();
         $this->assertEquals($status, 'No URLs provided for indexing.');
     }
 
     public function test_submit_no_is_allowed()
     {
         $indexNow = $this->app->make('IndexNow');
-        $status   = $indexNow->submit('/test');
+        $status = $indexNow->submit('/test');
         $this->assertEquals($status, 'The use of IndexNow has been temporarily blocked to prevent potential spam.');
     }
 
@@ -50,10 +49,20 @@ class IndexNowServiceTest extends TestCase
     public function test_unknown_driver_exception()
     {
         $this->expectException(SearchEngineUnknownException::class);
-        $this->expectExceptionMessage("Unknown search engine driver for IndexNow.");
+        $this->expectExceptionMessage('Unknown search engine driver for IndexNow.');
         $this->expectExceptionCode(404);
 
         $indexNow = $this->app->make('IndexNow');
         $indexNow->setDriver('unknown_driver');
+    }
+
+    public function test_submit_with_key_file()
+    {
+        $indexNow = $this->app->make('IndexNow');
+        $indexNow->keyFile('http://localhost/8bbf5df8bbaa457aab35bb3ccbb99aec.txt');
+        $status = $indexNow->submit(['/cat', '/cat3']);
+
+        $this->assertIsArray($status);
+        $this->assertContains('http://example.com/cat', $status);
     }
 }

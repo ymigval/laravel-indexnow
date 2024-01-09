@@ -12,24 +12,23 @@ class ShowIndexNowLogsCommand extends Command
      *
      * @var string
      */
-    protected $signature = "indexnow:logs";
+    protected $signature = 'indexnow:logs';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = "Display IndexNow logs";
+    protected $description = 'Display IndexNow logs';
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle(): int
     {
         $logs = LogManager::showLogs();
         $this->line($logs);
+
         return self::SUCCESS;
     }
 }

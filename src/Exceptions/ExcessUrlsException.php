@@ -10,7 +10,7 @@ class ExcessUrlsException extends Exception
     /**
      * @var string
      */
-    protected $message = "You have exceeded the maximum allowed number of URLs to send to IndexNow.";
+    protected $message = 'You have exceeded the maximum allowed number of URLs to send to IndexNow.';
 
     /**
      * @var int

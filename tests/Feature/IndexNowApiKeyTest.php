@@ -9,7 +9,6 @@ use Ymigval\LaravelIndexnow\Tests\TestCase;
 
 class IndexNowApiKeyTest extends TestCase
 {
-
     public function test_generate_new_key()
     {
         $this->assertNotEmpty(IndexNowApiKeyManager::generateNewApiKey());
@@ -27,7 +26,7 @@ class IndexNowApiKeyTest extends TestCase
     {
 
         $this->expectException(KeyFileDoesNotExistException::class);
-        $this->expectExceptionMessage("The IndexNow key file does not exist. To create one, use the command: php artisan indexnow:generate-key");
+        $this->expectExceptionMessage('The IndexNow key file does not exist. To create one, use the command: php artisan indexnow:generate-key');
         $this->expectExceptionCode(404);
 
         IndexNowApiKeyManager::getApiKey();
@@ -40,7 +39,7 @@ class IndexNowApiKeyTest extends TestCase
     {
 
         $this->expectException(InvalidKeyException::class);
-        $this->expectExceptionMessage("Your IndexNow key is invalid. To create a new one, use the command: php artisan indexnow:generate-key");
+        $this->expectExceptionMessage('Your IndexNow key is invalid. To create a new one, use the command: php artisan indexnow:generate-key');
         $this->expectExceptionCode(404);
 
         IndexNowApiKeyManager::getApiKey();

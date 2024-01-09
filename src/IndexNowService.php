@@ -5,9 +5,11 @@ namespace Ymigval\LaravelIndexnow;
 use Exception;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Ymigval\LaravelIndexnow\Exceptions\ExcessUrlsException;
+use Ymigval\LaravelIndexnow\Exceptions\InvalidKeyException;
 use Ymigval\LaravelIndexnow\Exceptions\MixedException;
 use Ymigval\LaravelIndexnow\Exceptions\NonAbsoluteUrlException;
 use Ymigval\LaravelIndexnow\Exceptions\SearchEngineUnknownException;
@@ -15,30 +17,32 @@ use Ymigval\LaravelIndexnow\Exceptions\SearchEngineUnknownException;
 class IndexNowService
 {
     /**
-     * @var Search Engine
+     * @var string | null
      */
-    private $searchengine;
+    private string $searchengine;
 
-    /**
-     * @var array
-     */
-    private $urls = [];
+    private string $key;
+
+    private ?string $keyFile = null;
+
+    private array $urls = [];
 
     /**
      * Initialize the IndexNow service.
      *
-     * @param string $searchengine The Search Engine to be used for indexing.
+     * @param  string  $searchengine The Search Engine to be used for indexing.
+     *
+     * @throws SearchEngineUnknownException
      */
     public function __construct(string $searchengine)
     {
         $this->setSearchEngine($searchengine);
+        $this->key = IndexNowApiKeyManager::getApiKey();
     }
 
     /**
      * Set the Search Engine for the IndexNow service.
      *
-     * @param string $searchengine
-     * @return void
      * @throws SearchEngineUnknownException
      */
     public function setSearchEngine(string $searchengine): void
@@ -52,8 +56,6 @@ class IndexNowService
 
     /**
      * Get the established searchengine for the IndexNow service.
-     *
-     * @return string
      */
     public function getSearchEngine(): string
     {
@@ -62,18 +64,34 @@ class IndexNowService
 
     /**
      * Get the IndexNow API key.
-     *
-     * @return string
      */
     public function getKey(): string
     {
-        return IndexNowApiKeyManager::getApiKey();
+        return $this->key;
+    }
+
+    /**
+     * Hosting a text key file within your host
+     *
+     * @throws InvalidKeyException
+     */
+    public function keyFile(string $file): void
+    {
+        $apiKey = Http::get($file)->body();
+        $apiKeyLength = strlen($apiKey);
+        $countNewLines = substr_count($apiKey, "\n");
+
+        if ($countNewLines != 0 || $apiKeyLength < 8 || $apiKeyLength > 128) {
+            throw new InvalidKeyException();
+        }
+
+        $this->keyFile = $file;
+        $this->key = $apiKey;
     }
 
     /**
      * Set URL for indexing.
      *
-     * @param  string $url
      * @return $this
      */
     public function setUrl(string $url): IndexNowService
@@ -85,8 +103,6 @@ class IndexNowService
 
     /**
      * Get URLs to be indexed.
-     *
-     * @return array
      */
     public function getUrls(): array
     {
@@ -96,12 +112,12 @@ class IndexNowService
     /**
      * Submit one or more URLs for indexing.
      *
-     * @param  string|array|null $url
+     * @param  string|array|null  $url
      * @return string|array
      */
     public function submit($url = null)
     {
-        if (!is_null($url)) {
+        if (! is_null($url)) {
             $this->setUrls($url);
         }
 
@@ -115,8 +131,7 @@ class IndexNowService
     /**
      * Set URLs for indexing.
      *
-     * @param  string|array $url
-     * @return void
+     * @param  string|array  $url
      */
     private function setUrls($url): void
     {
@@ -130,7 +145,6 @@ class IndexNowService
     /**
      * Parse and prepare URLs for indexing.
      *
-     * @return void
      * @throws ExcessUrlsException | NonAbsoluteUrlException
      */
     private function parseUrls(): void
@@ -143,25 +157,23 @@ class IndexNowService
         }
 
         foreach ($this->urls as $index => $url) {
-            // Si la url no tiene un host se considera que es relactiva
-            // Trata de convertirla en absoluta concatenandola con la url base (dominio) de la aplicacion
+            // If the url does not have a host it is considered relative.
+            // Try to make it absolute by concatenating it with the base url (domain) of the application.
             if (is_null(parse_url($url, PHP_URL_HOST))) {
                 $url = Str::of($urlApp)->append($url);
             }
 
-            // Verificar si la url es abosula
+            // Check if the url is absolute
             if (is_null(parse_url($url, PHP_URL_HOST))) {
                 throw new NonAbsoluteUrlException();
             }
 
-            $this->urls[$index] = $url;
+            $this->urls[$index] = $url->toString();
         }
     }
 
     /**
      * Get the host for the URLs.
-     *
-     * @return string
      */
     private function getHost(): string
     {
@@ -169,7 +181,7 @@ class IndexNowService
             $host = parse_url(rawurldecode($this->getUrls()[0]), PHP_URL_HOST);
         }
 
-        if (!isset($host)) {
+        if (! isset($host)) {
             $urlApp = Str::of(Config::get('app.urls'))
                 ->replaceMatches('#/*$#', '');
 
@@ -183,10 +195,11 @@ class IndexNowService
      * Process the indexing of URLs.
      *
      * @return string|array
+     *
+     * @throws MixedException
      */
     private function process()
     {
-
         if (Config::get('indexnow.ignore_production_environment') !== true && App::isProduction() == false) {
             return 'Sending requests to IndexNow is currently disabled in the local environment. To enable request sending in any environment, set the property "ignore_production_environment" to true in the configuration file. If you do not have the package configuration file, you can install it using the following command: php artisan vendor:publish --tag="indexnow"';
         }
@@ -197,22 +210,35 @@ class IndexNowService
 
         $this->parseUrls();
 
-        $endpoint = Str::of("https://<searchengine>/indexnow")
-            ->replace("<searchengine>", $this->getSearchEngine());
+        $endpoint = Str::of('https://<searchengine>/indexnow')
+            ->replace('<searchengine>', $this->getSearchEngine());
         $response = null;
 
         try {
             if (count($this->getUrls()) > 1) {
-                $data            = [];
-                $data['host']    = $this->getHost();
-                $data['key']     = $this->getKey();
+                $data = [];
+                $data['host'] = $this->getHost();
+                $data['key'] = $this->getKey();
+
+                if ($this->keyFile) {
+                    $data['keyLocation'] = $this->keyFile;
+                }
+
                 $data['urlList'] = $this->getUrls();
 
                 $response = Http::post($endpoint, $data);
-            } else if (count($this->getUrls()) == 1) {
+            } elseif (count($this->getUrls()) == 1) {
+                $data = [];
+                $data['url'] = $this->getUrls()[0];
+                $data['key'] = $this->getKey();
+
+                if ($this->keyFile) {
+                    $data['keyLocation'] = $this->keyFile;
+                }
+
                 $endpoint = Str::of($endpoint)
                     ->append('?')
-                    ->append(http_build_query(['url' => $this->getUrls()[0], 'key' => $this->getKey()]));
+                    ->append(http_build_query($data));
 
                 $response = Http::get($endpoint);
             } else {
@@ -226,9 +252,9 @@ class IndexNowService
 
         return [
             'searchengine' => $this->getSearchEngine(),
-            'status'       => $response->status(),
-            'info'         => $response->reason(),
-            'urls'         => $this->getUrls(),
+            'status' => $response->status(),
+            'info' => $response->reason(),
+            'urls' => $this->getUrls(),
         ];
     }
 }

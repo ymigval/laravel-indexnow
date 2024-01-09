@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -12,4 +13,5 @@ try {
             'Content-Type' => 'text/plain; charset=utf-8',
         ]);
     })->name('my_key_index_now');
-} catch (Exception $e) {}
+} catch (Exception $e) {
+}

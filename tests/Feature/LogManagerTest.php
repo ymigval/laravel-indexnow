@@ -7,7 +7,6 @@ use Ymigval\LaravelIndexnow\Tests\TestCase;
 
 class LogManagerTest extends TestCase
 {
-
     public function test_add_log()
     {
         LogManager::deleteLogFile();

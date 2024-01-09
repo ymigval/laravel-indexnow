@@ -1,4 +1,4 @@
-# ymigval/laravel-indexnow
+# Laravel IndexNow Package
 
 Laravel Package for notifying search engines about the latest changes to your URLs using the IndexNow API.
 
@@ -62,6 +62,21 @@ php artisan route:clear
 php artisan route:cache
 ```
 
+### Hosting a text key file within your host
+
+You can also host text key files in other locations within the same host and send it with the page submission.
+
+```php
+IndexNow::keyFile('http://localhost/keys/8bbf5df8bbaa457aab35bb3ccbb99aec.txt')
+    ->submit('https://example.com/cute-cats');
+```
+
+Services where you can generate and download a text key file:
+
+- Microsoft Bing: https://www.bing.com/indexnow
+- NowIndex: https://www.nowindex.org/indexnow-key/
+
+Or if you prefer to create it manually. Your-key should have a minimum of 8 and a maximum of 128 hexadecimal characters. The key can contain only the following characters: lowercase characters (a-z), uppercase characters (A-Z), numbers (0-9), and dashes (-).
 
 ## Usage
 You can submit one or more pages per request by calling the facade and passing the URL(s) to the submit method.

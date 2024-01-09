@@ -6,7 +6,6 @@ use Ymigval\LaravelIndexnow\Tests\TestCase;
 
 class HostRootKeyFileTest extends TestCase
 {
-
     /**
      * @test In a hypothetical scenario where the key file exists.
      */

@@ -2,23 +2,20 @@
 
 namespace Ymigval\LaravelIndexnow;
 
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\File;
-use \Illuminate\Http\Client\Response;
 
 class PreventSpan
 {
-
     /**
      * Path to the temporary usage blocking log file of IndexNow.
      *
      * @var string
      */
-    private static $blockingLogFilePath = __DIR__ . "/../storage/temporary_blocking.txt";
+    private static $blockingLogFilePath = __DIR__.'/../storage/temporary_blocking.txt';
 
     /**
      * Checks if sending requests is allowed.
-     *
-     * @return bool
      */
     public static function isAllowed(): bool
     {
@@ -53,13 +50,11 @@ class PreventSpan
         if ($response->status() == 429) {
             $timestamp = strtotime('+1 day');
             File::put(static::$blockingLogFilePath, $timestamp);
-        } 
+        }
     }
 
     /**
      * Deletes the temporary blocking log file.
-     *
-     * @return bool
      */
     public static function deleteBlockingLogFile(): bool
     {
@@ -68,7 +63,7 @@ class PreventSpan
 
     private static function isValidTimestamp($timestamp)
     {
-        if (!is_numeric($timestamp)) {
+        if (! is_numeric($timestamp)) {
             return false;
         }
 

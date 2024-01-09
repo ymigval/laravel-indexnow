@@ -7,7 +7,6 @@ use Ymigval\LaravelIndexnow\Tests\TestCase;
 
 class IndexNowCommandTest extends TestCase
 {
-
     public function test_generate_new_api_key()
     {
         $this->artisan('indexnow:generate-key')
@@ -18,7 +17,7 @@ class IndexNowCommandTest extends TestCase
     public function test_retrieve_my_index_now_api_key()
     {
         $this->artisan('indexnow:apikey')
-            ->expectsOutput('API Key: ' . IndexNowApiKeyManager::getApiKey())
+            ->expectsOutput('API Key: '.IndexNowApiKeyManager::getApiKey())
             ->assertExitCode(0);
     }
 
