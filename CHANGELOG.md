@@ -20,3 +20,10 @@ All notable changes to `ymigval/laravel-indexnow` will be documented in this fil
 - Basic documentation covering installation and usage.
 
 This version marks the initial launch of the `ymigval/laravel-indexnow` package, providing Laravel users with a convenient way to notify IndexNow about changes to their website URLs and enabling faster updates in search engine results.
+
+
+## 1.0.1 - 2024-12-26
+
+- Remove composer.lock file from the repository
+
+The composer.lock file was deleted to ensure local dependencies can be managed flexibly without conflicts in different environments. This allows developers to generate the file per their specific setups, accommodating changes in dependency versions.
