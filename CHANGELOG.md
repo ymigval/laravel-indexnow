@@ -27,3 +27,14 @@ This version marks the initial launch of the `ymigval/laravel-indexnow` package,
 - Remove composer.lock file from the repository
 
 The composer.lock file was deleted to ensure local dependencies can be managed flexibly without conflicts in different environments. This allows developers to generate the file per their specific setups, accommodating changes in dependency versions.
+
+## 1.0.2 - 2025-01-05
+
+### Fixed
+- Fixed an issue with the parseUrls() method.
+
+## 2.0.0 - 2025-01-05
+
+### Changed
+- Added support for the latest version of Laravel 11.
+- Applied general optimizations.

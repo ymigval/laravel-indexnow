@@ -9,15 +9,16 @@ class IndexNowCommandTest extends TestCase
 {
     public function test_generate_new_api_key()
     {
-        $this->artisan('indexnow:generate-key')
+        $this->artisan('indexnow:generate-apikey')
             ->expectsOutput('New IndexNow API key generated and saved successfully!')
             ->assertExitCode(0);
     }
 
+
     public function test_retrieve_my_index_now_api_key()
     {
         $this->artisan('indexnow:apikey')
-            ->expectsOutput('API Key: '.IndexNowApiKeyManager::getApiKey())
+            ->expectsOutput('API Key: '.IndexNowApiKeyManager::fetchOrGenerate())
             ->assertExitCode(0);
     }
 

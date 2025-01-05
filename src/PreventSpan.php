@@ -9,47 +9,29 @@ class PreventSpan
 {
     /**
      * Path to the temporary usage blocking log file of IndexNow.
-     *
-     * @var string
      */
-    private static $blockingLogFilePath = __DIR__.'/../storage/temporary_blocking.txt';
+    private const BLOCKING_LOG_FILE_PATH = __DIR__ . '/../storage/temporary_blocking.txt';
 
     /**
      * Checks if sending requests is allowed.
      */
     public static function isAllowed(): bool
     {
-        if (File::exists(static::$blockingLogFilePath)) {
-            $timestamp = File::get(static::$blockingLogFilePath);
-
-            if (self::isValidTimestamp($timestamp) && $timestamp > time()) {
-                $status = false;
-            } else {
-                $status = true;
-            }
-        } else {
-            $status = true;
-        }
-
-        if ($status) {
+        if (!self::shouldBlock()) {
             self::deleteBlockingLogFile();
+            return true;
         }
-
-        return $status;
+        return false;
     }
 
     /**
-     * Process response to detect possible span
-     *
-     * @return bool
+     * Detects potential spam and creates a blocking file if necessary.
      */
     public static function detectPotentialSpam(Response $response): void
     {
-        // In the IndexNow documentation, a response code 429 is considered Too Many Requests (potential spam).
-        // If this occurs, a temporary blocking file is created until a given date.
-        if ($response->status() == 429) {
+        if ($response->status() === 429) {
             $timestamp = strtotime('+1 day');
-            File::put(static::$blockingLogFilePath, $timestamp);
+            File::put(self::BLOCKING_LOG_FILE_PATH, $timestamp);
         }
     }
 
@@ -58,27 +40,34 @@ class PreventSpan
      */
     public static function deleteBlockingLogFile(): bool
     {
-        return File::delete(static::$blockingLogFilePath);
+        return File::delete(self::BLOCKING_LOG_FILE_PATH);
     }
 
-    private static function isValidTimestamp($timestamp)
+    /**
+     * Determines whether requests should be blocked based on the log file timestamp.
+     */
+    private static function shouldBlock(): bool
     {
-        if (! is_numeric($timestamp)) {
+        if (!File::exists(self::BLOCKING_LOG_FILE_PATH)) {
             return false;
         }
 
-        $timestamp = (int) $timestamp;
+        $timestamp = File::get(self::BLOCKING_LOG_FILE_PATH);
 
-        if ($timestamp < 0) {
+        return self::isTimestampValid($timestamp) && (int)$timestamp > time();
+    }
+
+    /**
+     * Validates if a given timestamp is in the correct format.
+     */
+    private static function isTimestampValid(mixed $timestamp): bool
+    {
+        if (!is_numeric($timestamp) || (int)$timestamp < 0) {
             return false;
         }
 
-        $timestampParts = date_parse(date('Y-m-d H:i:s', $timestamp));
-
-        if ($timestampParts['error_count'] === 0 && checkdate($timestampParts['month'], $timestampParts['day'], $timestampParts['year'])) {
-            return true;
-        } else {
-            return false;
-        }
+        $timestampParts = date_parse(date('Y-m-d H:i:s', (int)$timestamp));
+        return $timestampParts['error_count'] === 0
+            && checkdate($timestampParts['month'], $timestampParts['day'], $timestampParts['year']);
     }
 }

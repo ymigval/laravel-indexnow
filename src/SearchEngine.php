@@ -2,14 +2,12 @@
 
 namespace Ymigval\LaravelIndexnow;
 
-use Illuminate\Support\Str;
-
 class SearchEngine
 {
     /**
      * List of available search engine drivers.
      */
-    private static $drivers = [
+    private const SEARCH_ENGINE_DRIVERS = [
         'indexnow' => 'api.indexnow.org',
         'microsoft_bing' => 'www.bing.com',
         'naver' => 'searchadvisor.naver.com',
@@ -19,11 +17,9 @@ class SearchEngine
 
     /**
      * Get the URL of a search engine driver.
-     *
-     * @return string|null
      */
-    public static function getUrl(string $driver)
+    public static function getDriverUrl(string $driver): ?string
     {
-        return self::$drivers[Str::lower($driver)] ?? null;
+        return self::SEARCH_ENGINE_DRIVERS[strtolower($driver)] ?? null;
     }
 }

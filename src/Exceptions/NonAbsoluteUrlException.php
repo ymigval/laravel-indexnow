@@ -2,23 +2,12 @@
 
 namespace Ymigval\LaravelIndexnow\Exceptions;
 
-use Exception;
-use Ymigval\LaravelIndexnow\LogManager;
-
-class NonAbsoluteUrlException extends Exception
+class NonAbsoluteUrlException extends BaseLoggingException
 {
-    /**
-     * @var string
-     */
-    protected $message = 'Relative URLs detected. URLs submitted to IndexNow must be absolute or complete URLs.';
 
-    /**
-     * @var int
-     */
-    protected $code = 404;
-
-    public function __destruct()
+    public function __construct()
     {
-        LogManager::addLog($this->message);
+        $message = 'Relative URLs detected. URLs submitted to IndexNow must be absolute or complete URLs.';
+        parent::__construct($message);
     }
 }

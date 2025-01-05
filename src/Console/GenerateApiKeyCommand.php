@@ -5,14 +5,14 @@ namespace Ymigval\LaravelIndexnow\Console;
 use Illuminate\Console\Command;
 use Ymigval\LaravelIndexnow\IndexNowApiKeyManager;
 
-class GenerateIndexNowApiKeyCommand extends Command
+class GenerateApiKeyCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'indexnow:generate-key';
+    protected $signature = 'indexnow:generate-apikey';
 
     /**
      * The console command description.
@@ -22,25 +22,22 @@ class GenerateIndexNowApiKeyCommand extends Command
     protected $description = 'Generate a new IndexNow API key.';
 
     /**
-     * Create a new command instance.
+     * Success message for API key generation.
      *
-     * @return void
+     * @var string
      */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    private const SUCCESS_MESSAGE = 'New IndexNow API key generated and saved successfully!';
 
     /**
      * Execute the console command.
      */
     public function handle(): int
     {
-        $apiKey = IndexNowApiKeyManager::generateNewApiKey();
+        $apiKey = IndexNowApiKeyManager::generateApiKey();
 
-        $this->info('New IndexNow API key generated and saved successfully!');
+        $this->info(self::SUCCESS_MESSAGE);
         $this->newLine();
-        $this->line('API Key: '.$apiKey);
+        $this->line(sprintf('API Key: %s', $apiKey));
 
         return self::SUCCESS;
     }

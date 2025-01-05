@@ -2,23 +2,11 @@
 
 namespace Ymigval\LaravelIndexnow\Exceptions;
 
-use Exception;
-use Ymigval\LaravelIndexnow\LogManager;
-
-class KeyFileDoesNotExistException extends Exception
+class KeyFileDoesNotExistException extends BaseLoggingException
 {
-    /**
-     * @var string
-     */
-    protected $message = 'The IndexNow key file does not exist. To create one, use the command: php artisan indexnow:generate-key';
-
-    /**
-     * @var int
-     */
-    protected $code = 404;
-
-    public function __destruct()
+    public function __construct()
     {
-        LogManager::addLog($this->message);
+        $message = 'The IndexNow key file does not exist. To create one, use the command: php artisan indexnow:generate-apikey';
+        parent::__construct($message);
     }
 }
