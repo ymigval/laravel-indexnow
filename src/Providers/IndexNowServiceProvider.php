@@ -48,7 +48,7 @@ class IndexNowServiceProvider extends ServiceProvider
     private function bindIndexNowService(): void
     {
         $this->app->singleton('IndexNow', function ($app) {
-            $defaultSearchEngine = config('indexnow.searchengine', 'microsoft_bing');
+            $defaultSearchEngine = config('indexnow.search_engine', 'microsoft_bing');
             return new IndexNowService($defaultSearchEngine);
         });
     }
