@@ -2,23 +2,11 @@
 
 namespace Ymigval\LaravelIndexnow\Exceptions;
 
-use Exception;
-use Ymigval\LaravelIndexnow\LogManager;
-
-class InvalidKeyException extends Exception
+class InvalidKeyException extends BaseLoggingException
 {
-    /**
-     * @var string
-     */
-    protected $message = 'Your IndexNow key is invalid. To create a new one, use the command: php artisan indexnow:generate-key';
-
-    /**
-     * @var int
-     */
-    protected $code = 404;
-
-    public function __destruct()
+    public function __construct()
     {
-        LogManager::addLog($this->message);
+        $message = 'Your IndexNow key is invalid. To create a new one, use the command: php artisan indexnow:generate-apikey';
+        parent::__construct($message);
     }
 }

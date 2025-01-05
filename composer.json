@@ -33,12 +33,12 @@
         }
     },
     "require": {
-        "php": "^7.4 || ^8.0"
+        "php": ">=8.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^8.9",
-        "guzzlehttp/guzzle": "^7.7",
-        "laravel/pint": "^1.13"
+        "orchestra/testbench": "^9.9",
+        "guzzlehttp/guzzle": "^7.9",
+        "laravel/pint": "^1.19"
     },
     "extra": {
         "laravel": {

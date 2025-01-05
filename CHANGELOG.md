@@ -32,3 +32,9 @@ The composer.lock file was deleted to ensure local dependencies can be managed f
 
 ### Fixed
 - Fixed an issue with the parseUrls() method.
+
+## 2.0.0 - 2025-01-05
+
+### Changed
+- Added support for the latest version of Laravel 11.
+- Applied general optimizations.

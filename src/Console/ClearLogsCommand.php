@@ -5,7 +5,7 @@ namespace Ymigval\LaravelIndexnow\Console;
 use Illuminate\Console\Command;
 use Ymigval\LaravelIndexnow\LogManager;
 
-class ClearIndexNowLogsCommand extends Command
+class ClearLogsCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -22,13 +22,21 @@ class ClearIndexNowLogsCommand extends Command
     protected $description = 'Clear IndexNow logs';
 
     /**
+     * Success message for clearing logs.
+     *
+     * @var string
+     */
+    private const SUCCESS_MESSAGE = 'IndexNow logs have been successfully cleared.';
+
+    /**
      * Execute the console command.
      */
     public function handle(): int
     {
-        LogManager::deleteLogFile();
-        $this->info('IndexNow logs have been successfully cleared.');
+        LogManager::clearLogs();
+        $this->info(self::SUCCESS_MESSAGE);
 
         return self::SUCCESS;
     }
+
 }

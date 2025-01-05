@@ -30,12 +30,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Production Environment Control
+    | Enable Submissions
     |--------------------------------------------------------------------------
-    |
-    | By default, in a local environment, requests to IndexNow will not be sent.
-    | If you want to force sending requests in a local environment, disable this restriction by setting the property to true.
+
+    | Default: true
     |
     */
-    'ignore_production_environment' => env('INDEXNOW_IGNORE_PRODUCTION_ENVIRONMENT', false),
+    'enable_submissions' => env('INDEXNOW_ENABLE_SUBMISSIONS', true),
 ];

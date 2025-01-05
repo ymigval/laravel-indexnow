@@ -2,23 +2,11 @@
 
 namespace Ymigval\LaravelIndexnow\Exceptions;
 
-use Exception;
-use Ymigval\LaravelIndexnow\LogManager;
-
-class SearchEngineUnknownException extends Exception
+class SearchEngineUnknownException extends BaseLoggingException
 {
-    /**
-     * @var string
-     */
-    protected $message = 'Unknown search engine driver for IndexNow.';
-
-    /**
-     * @var int
-     */
-    protected $code = 404;
-
-    public function __destruct()
+    public function __construct()
     {
-        LogManager::addLog($this->message);
+        $message = 'Unknown search engine driver for IndexNow.';
+        parent::__construct($message);
     }
 }

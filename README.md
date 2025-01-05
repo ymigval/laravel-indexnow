@@ -34,7 +34,7 @@ The IndexNow API requires a request key, which should match a key file within th
 If you want to generate a new key and key file, use the following Artisan command:
 
 ```bash
-php artisan indexnow:generate-key
+php artisan indexnow:generate-apikey
 ```
 
 

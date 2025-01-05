@@ -10,69 +10,88 @@ use Illuminate\Support\Str;
 class LogManager
 {
     /**
+     * Maximum allowed size of the log file in bytes.
+     */
+    private const MAX_LOG_FILE_SIZE = 500000;
+
+
+    /**
+     * Date format used in log entries.
+     */
+    private const LOG_DATE_FORMAT = 'Y-m-d H:i:s';
+
+
+    /**
      * Path to the log file.
      *
      * @var string
      */
-    private static $logFilePath = __DIR__.'/../storage/log.txt';
+    private static string $logFilePath = __DIR__ . '/../storage/log.txt';
 
     /**
-     * Show logs.
-     *
-     * @return string
+     * Get the path to the log file.
      */
-    public static function showLogs()
+    private static function getLogFilePath(): string
     {
-        if (File::exists(static::$logFilePath)) {
-            return File::get(static::$logFilePath);
+        return self::$logFilePath;
+    }
+
+    /**
+     * Display the contents of the log file.
+     */
+    public static function showLogs(): string
+    {
+        if (File::exists(self::getLogFilePath())) {
+            return File::get(self::getLogFilePath());
         }
 
         return '';
     }
 
     /**
-     * Add log entry.
-     *
-     * @param  mixed  $message
+     * Add a log entry to the log file.
      */
-    public static function addLog($message): void
+    public static function addMessage(string|array $message): void
     {
-        self::writeLog($message);
+        self::write($message);
     }
 
     /**
      * Delete the log file.
      */
-    public static function deleteLogFile(): bool
+    public static function clearLogs(): bool
     {
-        return File::delete(static::$logFilePath);
+        return File::delete(self::getLogFilePath());
     }
 
     /**
-     * Write to the log file.
-     *
-     * @param  mixed  $message
+     * Ensures that the log file does not exceed the maximum allowed size.
      */
-    private static function writeLog($message): string
+    private static function ensureLogFileWithinSizeLimit(): void
+    {
+        if (File::exists(self::getLogFilePath()) && File::size(self::getLogFilePath()) > self::MAX_LOG_FILE_SIZE) {
+            self::clearLogs();
+        }
+    }
+
+    /**
+     * Write a message to the log file.
+     */
+    private static function write(string|array $message): void
     {
         if (Config::get('indexnow.enable_logging') === false) {
-            return 'logging is disabled';
+            return;
         }
 
-        if (File::exists(static::$logFilePath)) {
-            // If the log file size exceeds 500,000 Bytes, delete it
-            if (File::size(static::$logFilePath) > 500000) {
-                self::deleteLogFile();
-            }
-        }
+        // Ensure the log file is within the defined size limit.
+        self::ensureLogFileWithinSizeLimit();
 
-        $logEntry = Str::of(date(DateTimeInterface::W3C))
-            ->append(' > ')
+        $logEntry = Str::of(sprintf("[%s]", date(self::LOG_DATE_FORMAT)))
+            ->append(' ')
             ->append(json_encode($message, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES))
             ->append(PHP_EOL);
 
-        File::append(static::$logFilePath, $logEntry);
+        File::append(self::getLogFilePath(), $logEntry);
 
-        return $logEntry;
     }
 }

@@ -8,9 +8,7 @@ use Ymigval\LaravelIndexnow\Tests\TestCase;
 
 class PreventSpanTest extends TestCase
 {
-    /**
-     * @test
-     */
+
     public function test_detect_possible_span()
     {
         Http::fake([
@@ -24,9 +22,7 @@ class PreventSpanTest extends TestCase
         $this->assertFileExists('storage/temporary_blocking.txt');
     }
 
-    /**
-     * @test
-     */
+
     public function test_detect_possible_span_v2()
     {
         Http::fake([
@@ -39,18 +35,14 @@ class PreventSpanTest extends TestCase
         $this->assertFileDoesNotExist('storage/temporary_blocking.txt');
     }
 
-    /**
-     * @test
-     */
     public function test_allow()
     {
         $status = PreventSpan::isAllowed();
+
         $this->assertTrue($status);
     }
 
-    /**
-     * @test
-     */
+
     public function test_allow_v2()
     {
         $status = PreventSpan::isAllowed();
