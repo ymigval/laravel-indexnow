@@ -168,7 +168,7 @@ class IndexNowService
                 throw new NonAbsoluteUrlException();
             }
 
-            $this->urls[$index] = $url->toString();
+            $this->urls[$index] = (string) $url;
         }
     }
 
