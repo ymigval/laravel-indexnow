@@ -38,3 +38,9 @@ The composer.lock file was deleted to ensure local dependencies can be managed f
 ### Changed
 - Added support for the latest version of Laravel 11.
 - Applied general optimizations.
+
+## 2.0.1 - 2025-04-01
+
+### Fixed
+-  Avoid function declaration.
+
