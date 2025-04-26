@@ -37,7 +37,7 @@ class IndexNowServiceTest extends TestCase
     #[Test] public function it_can_set_search_engine()
     {
         // Arrange
-        $service = new IndexNowService('microsoft_bing');
+        $service = new IndexNowService('indexnow');
 
         // Act
         $service->setSearchEngine('yandex');
@@ -49,7 +49,7 @@ class IndexNowServiceTest extends TestCase
     #[Test] public function it_throws_exception_for_invalid_search_engine()
     {
         // Arrange
-        $service = new IndexNowService('microsoft_bing');
+        $service = new IndexNowService('indexnow');
 
         // Assert
         $this->expectException(SearchEngineUnknownException::class);
@@ -61,7 +61,7 @@ class IndexNowServiceTest extends TestCase
     #[Test] public function it_can_add_urls()
     {
         // Arrange
-        $service = new IndexNowService('microsoft_bing');
+        $service = new IndexNowService('indexnow');
 
         // Act
         $service->setUrl('https://example.com/page1');
@@ -75,7 +75,7 @@ class IndexNowServiceTest extends TestCase
     #[Test] public function it_deduplicates_urls()
     {
         // Arrange
-        $service = new IndexNowService('microsoft_bing');
+        $service = new IndexNowService('indexnow');
 
         // Act
         $service->setUrl('https://example.com/page');
@@ -89,24 +89,25 @@ class IndexNowServiceTest extends TestCase
     {
         // Arrange
         Http::fake([
-            'https://www.bing.com/indexnow' => Http::response(['status' => 'success'], 200),
+            'https://api.indexnow.org/indexnow' => Http::response(['status' => 'success'], 200),
         ]);
 
-        $service = new IndexNowService('microsoft_bing');
+        $service = new IndexNowService('indexnow');
 
         // Act
         $result = $service->submit('https://example.com/page');
 
         // Assert
         $this->assertIsArray($result);
-        $this->assertEquals(202, $result['status']);
+        $this->assertEquals(200, $result['status']);
         $this->assertEquals(['https://example.com/page'], $result['urls']);
 
         // Verificar que la solicitud se realizó correctamente
         Http::assertSent(function ($request) {
-            return $request->url() === 'https://www.bing.com/indexnow' &&
-                $request->hasQuery('url', 'https://example.com/page') &&
-                $request->hasQuery('key', 'validApiKey12345');
+            $data = $request->data();
+            return $request->url() === 'https://api.indexnow.org/indexnow' &&
+                $data['key'] === 'validApiKey12345' &&
+                $data['urlList'] === ['https://example.com/page'];
         });
     }
 
@@ -114,10 +115,10 @@ class IndexNowServiceTest extends TestCase
     {
         // Arrange
         Http::fake([
-            'https://www.bing.com/indexnow' => Http::response(['status' => 'success'], 200),
+            'https://api.indexnow.org/indexnow' => Http::response(['status' => 'success'], 200),
         ]);
 
-        $service = new IndexNowService('microsoft_bing');
+        $service = new IndexNowService('indexnow');
         $urls = [
             'https://example.com/page1',
             'https://example.com/page2',
@@ -135,7 +136,7 @@ class IndexNowServiceTest extends TestCase
         // Verify that the request was completed successfully
         Http::assertSent(function ($request) use ($urls) {
             $data = $request->data();
-            return $request->url() === 'https://www.bing.com/indexnow' &&
+            return $request->url() === 'https://api.indexnow.org/indexnow' &&
                 $request->method() === 'POST' &&
                 isset($data['urlList']) &&
                 count($data['urlList']) === 3 &&
@@ -147,7 +148,7 @@ class IndexNowServiceTest extends TestCase
     #[Test] public function it_throws_exception_for_too_many_urls()
     {
         // Arrange
-        $service = new IndexNowService('microsoft_bing');
+        $service = new IndexNowService('indexnow');
         $urls = [];
 
         // Generate more than 10,000 URLs
@@ -166,10 +167,10 @@ class IndexNowServiceTest extends TestCase
     {
         // Arrange
         Http::fake([
-            'https://www.bing.com/indexnow*' => Http::response(['status' => 'success'], 200),
+            'https://api.indexnow.org/indexnow' => Http::response(['status' => 'success'], 200),
         ]);
 
-        $service = new IndexNowService('microsoft_bing');
+        $service = new IndexNowService('indexnow');
 
         // Act
         $result = $service->submit('/relative-page');
@@ -185,7 +186,7 @@ class IndexNowServiceTest extends TestCase
         Config::set('app.url', '');
 
         // Arrange
-        $service = new IndexNowService('microsoft_bing');
+        $service = new IndexNowService('indexnow');
 
 
         // Assert
@@ -200,7 +201,7 @@ class IndexNowServiceTest extends TestCase
     {
         // Arrange
         Config::set('indexnow.enable_submissions', false);
-        $service = new IndexNowService('microsoft_bing');
+        $service = new IndexNowService('indexnow');
 
         // Act
         $result = $service->submit('https://example.com/page');
@@ -217,7 +218,7 @@ class IndexNowServiceTest extends TestCase
             $mock->shouldReceive('isAllowed')->andReturn(false);
         });
 
-        $service = new IndexNowService('microsoft_bing');
+        $service = new IndexNowService('indexnow');
 
         // Act
         $result = $service->submit('https://example.com/page');
@@ -231,10 +232,10 @@ class IndexNowServiceTest extends TestCase
     {
         // Arrange
         Http::fake([
-            'https://www.bing.com/indexnow' => Http::response(['status' => 'success'], 200),
+            'https://api.indexnow.org/indexnow' => Http::response(['status' => 'success'], 200),
         ]);
 
-        $service = new IndexNowService('microsoft_bing');
+        $service = new IndexNowService('indexnow');
         $urls = [
             'https://customdomain.com/page1',
             'https://customdomain.com/page2',
@@ -249,7 +250,7 @@ class IndexNowServiceTest extends TestCase
         // Verify that the host was extracted correctly
         Http::assertSent(function ($request) {
             $data = $request->data();
-            return $request->url() === 'https://www.bing.com/indexnow' &&
+            return $request->url() === 'https://api.indexnow.org/indexnow' &&
                 $data['host'] === 'customdomain.com';
         });
     }

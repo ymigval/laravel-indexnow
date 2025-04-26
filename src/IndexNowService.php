@@ -191,14 +191,16 @@ class IndexNowService
 
 
     /**
-     * Processes the IndexNow submission by validating configurations, parsing URLs, and sending a request to the search engine's API.
-     * Returns either an informational message or an array with detailed submission information.
+     * Processes the IndexNow submission workflow, validating configurations,
+     * preventing spam, preparing URLs, and sending requests to the specified search engine.
+     * Returns detailed information about the submission or an error message if processing fails.
      *
-     * @return array|string Returns an array containing submission details (search engine, status, info, and URLs)
-     *                      or a string message describing the result or issue encountered.
-     * @throws NonAbsoluteUrlException If one or more provided URLs are not absolute.
-     * @throws ExcessUrlsException If the quantity of URLs exceeds the allowed limit for submission.
-     * @throws MixedException If a general error occurs during the process.
+     * @return array|string Returns an associative array containing details about the submission
+     *                      (search engine, response status, response info, and URLs) if successful,
+     *                      or a string message indicating the reason for failure.
+     * @throws NonAbsoluteUrlException If any of the provided URLs are not absolute.
+     * @throws ExcessUrlsException If the number of URLs exceeds the allowable limit.
+     * @throws MixedException For general exceptions during the process execution.
      */
     private function process(): array|string
     {
@@ -217,19 +219,8 @@ class IndexNowService
             $endpoint = Str::of('https://<searchengine>/indexnow')
                 ->replace('<searchengine>', $this->getSearchEngine());
 
-            if (count($urls) > 1) {
+            if (count($urls)) {
                 $response = Http::post((string)$endpoint, $this->buildRequestData());
-            } elseif (count($urls) === 1) {
-                $queryParams = [
-                    'url' => $urls[0],
-                    'key' => $this->key,
-                ];
-
-                if ($this->keyFile) {
-                    $queryParams['keyLocation'] = $this->keyFile;
-                }
-
-                $response = Http::get((string)$endpoint->append('?')->append(http_build_query($queryParams)));
             } else {
                 return 'No URLs provided for indexing.';
             }
