@@ -2,6 +2,15 @@
 
 All notable changes to `ymigval/laravel-indexnow` will be documented in this file.
 
+## 3.0.1 - 2025-04-26
+
+### Fixed
+
+- Resolved issue with IndexNow API key route not working after running `php artisan optimize`
+- Improved route registration mechanism to be compatible with Laravel route caching
+- Added dedicated service provider for handling dynamic routes
+- Optimized controller implementation for better caching support
+
 ## 3.0.0 - 2025-04-25
 
 ### Added
