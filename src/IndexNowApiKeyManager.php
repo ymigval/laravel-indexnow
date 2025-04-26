@@ -2,19 +2,11 @@
 
 namespace Ymigval\LaravelIndexnow;
 
-use Exception;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Config;
 use Ymigval\LaravelIndexnow\Exceptions\InvalidKeyException;
-use Ymigval\LaravelIndexnow\Exceptions\KeyFileDoesNotExistException;
-use Ymigval\LaravelIndexnow\Exceptions\MixedException;
 
 class IndexNowApiKeyManager
 {
-    /**
-     * Path to the IndexNow API key file.
-     */
-    private const API_KEY_FILE_PATH = __DIR__ . '/../storage/indexnow_api_key.txt';
-
     /**
      * Minimum and maximum lengths for valid API keys.
      */
@@ -22,58 +14,47 @@ class IndexNowApiKeyManager
     private const MAX_KEY_LENGTH = 128;
 
     /**
-     * Fetches the API key from the specified file if it exists and is valid.
-     * If the file does not exist or contains an invalid key, a new API key is generated.
+     * Retrieves the API key from the configuration.
      *
-     * @return string Returns a valid API key, either fetched or newly generated.
+     * First attempts to fetch the key from the configuration settings and validates it.
+     * If the key is invalid, logs a message and rethrows the exception.
+     *
+     * @return string Returns the valid API key.
+     * @throws InvalidKeyException Throws an exception if the retrieved key is invalid.
      */
-    public static function fetchOrGenerate(): string
+    public static function getKey(): string
     {
+        // First try to get the key from config
+        $configKey = Config::get('indexnow.indexnow_api_key');
+
         try {
-            if (!File::exists(self::API_KEY_FILE_PATH)) {
-                throw new KeyFileDoesNotExistException();
-            }
+            self::validateKey($configKey);
+            return $configKey;
+        } catch (InvalidKeyException $exception) {
+            LogManager::addMessage('Invalid API key in configuration. Attempting to fetch from file or generate new one.');
 
-            $apiKey = File::get(self::API_KEY_FILE_PATH);
-            self::validateKey($apiKey);
-
-            return $apiKey;
-        } catch (KeyFileDoesNotExistException|InvalidKeyException) {
-            // If there's no valid API key, generate a new one.
-
-            LogManager::addMessage('A new API Key has been created');
-
-            return self::generateApiKey();
+            throw $exception;
         }
     }
 
-    /**
-     * Generate and save a new IndexNow API key file.
-     */
-    public static function generateApiKey(): string
-    {
-        try {
-            $randomBytes = random_bytes(16);
-        } catch (Exception) {
-            new MixedException('Unable to generate API Key');
-        }
-
-        $apiKey = bin2hex($randomBytes);
-        File::put(self::API_KEY_FILE_PATH, $apiKey);
-
-        return $apiKey;
-    }
 
     /**
      * Validate the provided API key.
      *
-     * @throws InvalidKeyException
+     * @param string|null $key The API key to validate
+     * @throws InvalidKeyException If the key is invalid
      */
-    private static function validateKey(string $key): void
+    private static function validateKey(?string $key): void
     {
+        $key = trim($key);
         $keyLength = strlen($key);
 
         if ($keyLength < self::MIN_KEY_LENGTH || $keyLength > self::MAX_KEY_LENGTH) {
+            throw new InvalidKeyException();
+        }
+
+        // Check if key contains only alphanumeric characters
+        if (!ctype_alnum($key)) {
             throw new InvalidKeyException();
         }
     }

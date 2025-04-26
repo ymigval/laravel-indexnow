@@ -3,9 +3,10 @@
 namespace Ymigval\LaravelIndexnow\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Ymigval\LaravelIndexnow\Console\CheckStatusCommand;
 use Ymigval\LaravelIndexnow\Console\ClearLogsCommand;
-use Ymigval\LaravelIndexnow\Console\GenerateApiKeyCommand;
 use Ymigval\LaravelIndexnow\Console\GetApiKeyCommand;
+use Ymigval\LaravelIndexnow\Console\ResetBlockCommand;
 use Ymigval\LaravelIndexnow\Console\ShowLogsCommand;
 use Ymigval\LaravelIndexnow\IndexNowService;
 
@@ -71,10 +72,11 @@ class IndexNowServiceProvider extends ServiceProvider
     private function getCommandList(): array
     {
         return [
-            GenerateApiKeyCommand::class,
+            CheckStatusCommand::class,
             GetApiKeyCommand::class,
             ShowLogsCommand::class,
             ClearLogsCommand::class,
+            ResetBlockCommand::class,
         ];
     }
 

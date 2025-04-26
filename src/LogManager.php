@@ -2,7 +2,6 @@
 
 namespace Ymigval\LaravelIndexnow;
 
-use DateTimeInterface;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -28,10 +27,13 @@ class LogManager
      */
     private static string $logFilePath = __DIR__ . '/../storage/log.txt';
 
+
     /**
      * Get the path to the log file.
+     *
+     * @return string The path to the log file
      */
-    private static function getLogFilePath(): string
+    public static function getLogFilePath(): string
     {
         return self::$logFilePath;
     }

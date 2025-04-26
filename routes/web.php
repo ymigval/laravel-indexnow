@@ -18,6 +18,7 @@ if (!function_exists('registerIndexNowKeyRoute')) {
     {
         return Str::of('/')->append($apiKey)->append('.txt')->toString();
     }
+
     /**
      * Registers the IndexNow API key route.
      *
@@ -29,11 +30,12 @@ if (!function_exists('registerIndexNowKeyRoute')) {
             return new Response($apiKey, ResponseAlias::HTTP_OK, [
                 'Content-Type' => 'text/plain; charset=utf-8',
             ]);
-        })->name('my_key_index_now');
+        })->name('indexnow_key_verification');
     }
 
     try {
-        $apiKey = IndexNowApiKeyManager::fetchOrGenerate();
+        // Use the new getKey method instead of fetchOrGenerate
+        $apiKey = IndexNowApiKeyManager::getKey();
         registerIndexNowKeyRoute($apiKey);
     } catch (Exception $e) {
         LogManager::addMessage(
