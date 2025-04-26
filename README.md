@@ -1,132 +1,146 @@
 # Laravel IndexNow Package
 
-Laravel Package for notifying search engines about the latest changes to your URLs using the IndexNow API.
+A Laravel package that simplifies the integration with IndexNow API to notify search engines about URL changes in
+real-time.
 
-This package provides a simple mechanism to notify IndexNow about changes to your URLs. It's ideal for implementing in methods related to content creation, editing, or deletion on your website.
+## 🎯 Overview
 
+This package provides an elegant way to notify search engines about changes to your website's URLs using the IndexNow
+API. Perfect for keeping search engines updated when content is created, modified, or deleted on your website.
 
-## What is IndexNow?
+## 🔍 What is IndexNow?
 
-[IndexNow](https://www.indexnow.org) is a service that instantly informs search engines about the latest content changes on your website. This allows search engines to quickly update these changes in their search results.
+[IndexNow](https://www.indexnow.org) is an open protocol that enables websites to instantly inform search engines about
+latest content changes. This ensures faster indexing and more up-to-date search results.
 
+## Features
 
-## Installation
+- 🚀 Instant search engine notification
+- 📦 Simple integration with Laravel
+- 🔄 Support for single and bulk URL submissions
+- 🛡️ Built-in spam prevention
+- 📝 Detailed logging system
+- ⚙️ Configurable environment settings
 
-You can install the package via Composer:
+## Requirements
 
-```bash
+- PHP 8.0 or higher
+- Laravel 8.0 or higher
+
+## ⚙️ Installation
+
+Install the package via Composer:
+
+```shell script
 composer require ymigval/laravel-indexnow
 ```
 
+## 🛠️ Configuration
 
-Sending requests to IndexNow is currently disabled in the local environment. To enable request sending in any environment, set the "ignore_production_environment" property to true in the configuration file.
+1. Publish the configuration file:
 
-You can publish the configuration file using the following command:
-
-```bash
+```shell script
 php artisan vendor:publish --tag="indexnow"
 ```
 
-### IndexNow API Key
+2. Generate an IndexNow API key from one of these services:
+   - [Microsoft Bing](https://www.bing.com/indexnow/getstarted#implementation)
+   - [NowIndex](https://www.nowindex.org/indexnow-key/)
 
-The IndexNow API requires a request key, which should match a key file within the host domain. Fortunately, this step is automated for you.
+3. Add your API key to the `.env` file:
 
-If you want to generate a new key and key file, use the following Artisan command:
-
-```bash
-php artisan indexnow:generate-apikey
+```
+INDEXNOW_API_KEY=your_api_key_here
 ```
 
+### Key File Verification
 
-#### Verifying Your Key File
+Place your API key file at your domain's root with a `.txt` extension:
 
-Place the API key code at the root of your domain and append the `.txt` extension to it.
-
-Example:
-
+```
 https://www.example.com/4cea016a4ddb408592569456a9c4896b.txt
-
-
-To find out your IndexNow API key, use the following Artisan command:
-
-
-```bash
-php artisan indexnow:apikey
 ```
 
-If the route doesn't work, clear the route cache:
+Helpful commands:
 
+```shell script
+# View your IndexNow API key
+php artisan indexnow:apikey
 
-```bash
+# If the route doesn't work, clear and cache routes
 php artisan route:clear
 php artisan route:cache
+
+# Check IndexNow package status and configuration
+php artisan indexnow:status
 ```
 
-### Hosting a text key file within your host
+The `indexnow:status` command will help you verify:
 
-You can also host text key files in other locations within the same host and send it with the page submission.
+- API Key configuration and validity
+- Key file accessibility
+- Configuration file status
+- Search engine settings
+- Submissions status
+- Logging configuration
+- Spam protection status
+- Route registration
+- Overall package status and provide recommendations
 
-```php
-IndexNow::keyFile('https://www.example.com/keys/8bbf5df8bbaa457aab35bb3ccbb99aec.txt')
-    ->submit('https://www.example.com/cute-cats');
-```
+## 📋 Usage
 
-Services where you can generate and download a text key file:
-
-- Microsoft Bing: https://www.bing.com/indexnow
-- NowIndex: https://www.nowindex.org/indexnow-key/
-
-Or if you prefer to create it manually. Your-key should have a minimum of 8 and a maximum of 128 hexadecimal characters. The key can contain only the following characters: lowercase characters (a-z), uppercase characters (A-Z), numbers (0-9), and dashes (-).
-
-## Usage
-You can submit one or more pages per request by calling the facade and passing the URL(s) to the submit method.
-
-### Submit a single page
+### Single URL Submission
 ```php
 use Ymigval\LaravelIndexnow\Facade\IndexNow;
 
-IndexNow::submit('https://www.example.com/cute-cats');
+IndexNow::submit('https://www.example.com/my-page');
 ```
 
-### Submit multiple pages
-To submit multiple pages at once, provide an array of URLs.
-
+### Multiple URLs Submission
 ```php
 use Ymigval\LaravelIndexnow\Facade\IndexNow;
 
+// Using array
 IndexNow::submit([
-    'https://www.example.com/cute-cats',
-    'https://www.example.com/dog-love',
-    'https://www.example.com/nature',
+    'https://www.example.com/page-1',
+    'https://www.example.com/page-2',
+    'https://www.example.com/page-3',
 ]);
 
 // Or using method chaining
-
-IndexNow::setUrl('https://www.example.com/cute-cats')
-        ->setUrl('https://www.example.com/dog-love')
-        ->setUrl('https://www.example.com/nature')
+IndexNow::setUrl('https://www.example.com/page-1')
+        ->setUrl('https://www.example.com/page-2')
+        ->setUrl('https://www.example.com/page-3')
         ->submit();
 ```
 
+## 🛡️ Security
 
-### Preventing Spam
-ymigval/laravel-indexnow includes spam prevention mechanisms. When potential spam is detected, the request sending is temporarily blocked for 24 hours.
+### Spam Prevention
 
+The package includes built-in spam protection that temporarily blocks requests for 24 hours when suspicious activity is
+detected.
 
-### Logs
-ymigval/laravel-indexnow includes an internal logging handler that you can use to print out actions' details.
+## 📊 Logging
 
-Use the following Artisan command:
+View action logs using the Artisan command:
 
-```bash
+```shell script
 php artisan indexnow:logs
 ```
 
+## 📝 Changelog
 
-## Changelog
-Please refer to the [CHANGELOG](CHANGELOG.md) for more information about recent changes.
+See [CHANGELOG](CHANGELOG.md) for all notable changes.
 
+## 📄 License
 
+This package is open-source software licensed under the [MIT License](LICENSE).
 
-## License
-The MIT License (MIT). For more information, please see the [License File](LICENSE).
+## 🤝 Contributing
+
+Contributions are welcome! Please see the [contributing guide](CONTRIBUTING.md) for details.
+
+## ⭐ Support
+
+If you find this package helpful, please consider giving it a star on GitHub!

@@ -3,7 +3,6 @@
 namespace Ymigval\LaravelIndexnow;
 
 use Exception;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -24,11 +23,12 @@ class IndexNowService
      * Initialize the IndexNow service with the given search engine.
      *
      * @throws SearchEngineUnknownException
+     * @throws InvalidKeyException
      */
     public function __construct(string $searchengine)
     {
         $this->setSearchEngine($searchengine);
-        $this->key = IndexNowApiKeyManager::fetchOrGenerate();
+        $this->key = IndexNowApiKeyManager::getKey();
     }
 
     /**
@@ -55,34 +55,6 @@ class IndexNowService
     public function getSearchEngine(): string
     {
         return $this->searchengine ?? '';
-    }
-
-    /**
-     * Retrieves the key associated with the current instance.
-     *
-     * @return string The key stored within the instance.
-     */
-    public function getKey(): string
-    {
-        return $this->key;
-    }
-
-    /**
-     * Sets the API key file path and validates the API key retrieved from the file.
-     *
-     * @param string $file The file path containing the API key.
-     * @return void
-     * @throws InvalidKeyException If the API key is invalid, has incorrect length, or contains line breaks.
-     */
-    public function keyFile(string $file): void
-    {
-        $apiKey = Http::get($file)->body();
-        if (substr_count($apiKey, "\n") !== 0 || strlen($apiKey) < 8 || strlen($apiKey) > 128) {
-            throw new InvalidKeyException();
-        }
-
-        $this->keyFile = $file;
-        $this->key = $apiKey;
     }
 
     /**
@@ -143,29 +115,40 @@ class IndexNowService
      */
     private function parseUrls(): void
     {
-        $urlApp = Str::of(Config::get('app.url'))
-            ->replaceMatches('#/*$#', ''); // Ensure base URL is clean
+        if (empty($this->urls)) {
+            return;
+        }
 
         if (count($this->urls) > 10000) {
             throw new ExcessUrlsException();
         }
 
-        foreach ($this->urls as $index => $url) {
-            // If the URL does not have a host, it is considered relative.
-            // Try to make it absolute by concatenating it with the base URL.
-            if (is_null(parse_url($url, PHP_URL_HOST))) {
-                $url = Str::of($urlApp)->append($url);
-            } else {
-                $url = Str::of($url); // Ensure `$url` is always Stringable
-            }
+        $applicationBaseUrl = Str::of(Config::get('app.url'))
+            ->trim()
+            ->replaceMatches('#/*$#', '');
 
-            // Check if the URL is valid and absolute
-            if (is_null(parse_url($url, PHP_URL_HOST))) {
-                throw new NonAbsoluteUrlException();
-            }
-
-            $this->urls[$index] = (string) $url; // Convert back to string for final assignment
+        foreach ($this->urls as $index => $rawUrl) {
+            $normalizedUrl = $this->normalizeAndValidateUrl($rawUrl, $applicationBaseUrl);
+            $this->urls[$index] = (string)$normalizedUrl;
         }
+    }
+
+    private function normalizeAndValidateUrl(string $url, string $baseUrl): string
+    {
+        $url = Str::of($url)->trim();
+
+        $urlComponents = parse_url($url);
+
+        if (empty($urlComponents['scheme']) || empty($urlComponents['host'])) {
+            $url = Str::of($baseUrl)->append($url);
+            $urlComponents = parse_url($url);
+        }
+
+        if (empty($urlComponents['scheme']) || empty($urlComponents['host'])) {
+            throw new NonAbsoluteUrlException();
+        }
+
+        return $url;
     }
 
     /**
@@ -206,17 +189,16 @@ class IndexNowService
         return $host ?? '';
     }
 
+
     /**
-     * Processes URL submission to the IndexNow API based on the provided configuration and environment settings.
+     * Processes the IndexNow submission by validating configurations, parsing URLs, and sending a request to the search engine's API.
+     * Returns either an informational message or an array with detailed submission information.
      *
-     * This method validates the environment, checks spam prevention mechanisms, prepares the URLs,
-     * and sends them to the appropriate search engine endpoint for indexing. Responses are handled
-     * accordingly, and potential exceptions are captured and rethrown as MixedException.
-     *
-     * @return array|string Returns an array containing the search engine name, response status, info,
-     * and URLs if the submission is successful, or a string message for specific cases like a disabled
-     * environment, a temporary block due to spam prevention, or when no URLs are provided for indexing.
-     * @throws MixedException If an error occurs during the HTTP request to the IndexNow API.
+     * @return array|string Returns an array containing submission details (search engine, status, info, and URLs)
+     *                      or a string message describing the result or issue encountered.
+     * @throws NonAbsoluteUrlException If one or more provided URLs are not absolute.
+     * @throws ExcessUrlsException If the quantity of URLs exceeds the allowed limit for submission.
+     * @throws MixedException If a general error occurs during the process.
      */
     private function process(): array|string
     {
@@ -224,33 +206,44 @@ class IndexNowService
             return 'Enable Submissions is set to false. To allow submissions, please check the configuration file and set it to true.';
         }
 
-        if (!PreventSpan::isAllowed()) {
+        if (!PreventSpam::isAllowed()) {
             return 'The use of IndexNow has been temporarily blocked to prevent potential spam.';
         }
 
-        $this->parseUrls();
-        $urls = $this->getUrls();
-
-        $endpoint = Str::of('https://<searchengine>/indexnow')
-            ->replace('<searchengine>', $this->getSearchEngine());
-
         try {
+            $this->parseUrls();
+            $urls = $this->getUrls();
+
+            $endpoint = Str::of('https://<searchengine>/indexnow')
+                ->replace('<searchengine>', $this->getSearchEngine());
+
             if (count($urls) > 1) {
                 $response = Http::post((string)$endpoint, $this->buildRequestData());
             } elseif (count($urls) === 1) {
-                $response = Http::get((string)$endpoint->append('?')->append(http_build_query([
+                $queryParams = [
                     'url' => $urls[0],
                     'key' => $this->key,
-                    'keyLocation' => $this->keyFile,
-                ])));
+                ];
+
+                if ($this->keyFile) {
+                    $queryParams['keyLocation'] = $this->keyFile;
+                }
+
+                $response = Http::get((string)$endpoint->append('?')->append(http_build_query($queryParams)));
             } else {
                 return 'No URLs provided for indexing.';
             }
+        } catch (NonAbsoluteUrlException|ExcessUrlsException $e) {
+            throw $e;
         } catch (Exception $e) {
             throw new MixedException($e->getMessage(), $e->getCode());
         }
 
-        PreventSpan::detectPotentialSpam($response);
+        // Get URLs for logging
+        $urlToLog = count($urls) === 1 ? $urls[0] : (count($urls) > 1 ? $urls[0] : null);
+
+        // Pass the URL information to improve logging
+        PreventSpam::detectPotentialSpam($response, $urlToLog);
 
         return [
             'searchengine' => $this->getSearchEngine(),

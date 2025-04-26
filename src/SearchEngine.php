@@ -22,4 +22,9 @@ class SearchEngine
     {
         return self::SEARCH_ENGINE_DRIVERS[strtolower($driver)] ?? null;
     }
+
+    public static function getAllEngines()
+    {
+        return array_keys(self::SEARCH_ENGINE_DRIVERS);
+    }
 }
