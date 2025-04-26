@@ -2,19 +2,23 @@
 
 namespace Ymigval\LaravelIndexnow\Providers;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Ymigval\LaravelIndexnow\Console\CheckStatusCommand;
 use Ymigval\LaravelIndexnow\Console\ClearLogsCommand;
 use Ymigval\LaravelIndexnow\Console\GetApiKeyCommand;
 use Ymigval\LaravelIndexnow\Console\ResetBlockCommand;
 use Ymigval\LaravelIndexnow\Console\ShowLogsCommand;
+use Ymigval\LaravelIndexnow\Controllers\IndexNowKeyController;
+use Ymigval\LaravelIndexnow\IndexNowApiKeyManager;
 use Ymigval\LaravelIndexnow\IndexNowService;
+use Ymigval\LaravelIndexnow\LogManager;
 
 class IndexNowServiceProvider extends ServiceProvider
 {
     // Configuration constants
     private const CONFIG_PATH = __DIR__ . '/../../config/indexnow.php';
-    private const ROUTES_PATH = __DIR__ . '/../../routes/web.php';
     private const CONFIG_TAG = 'indexnow';
 
     /**
@@ -33,6 +37,7 @@ class IndexNowServiceProvider extends ServiceProvider
     {
         $this->registerCommands(); // Register console commands
         $this->loadResourceFiles(); // Load routes and publish configuration
+        $this->registerIndexNowRoute(); // Register route
     }
 
     /**
@@ -85,9 +90,33 @@ class IndexNowServiceProvider extends ServiceProvider
      */
     private function loadResourceFiles(): void
     {
-        $this->loadRoutesFrom(self::ROUTES_PATH);
         $this->publishes([
             self::CONFIG_PATH => config_path('/indexnow.php'),
         ], self::CONFIG_TAG);
+    }
+
+    /**
+     * Register the IndexNow key verification route.
+     */
+    protected function registerIndexNowRoute(): void
+    {
+        try {
+            // Get the API key from configuration
+            $apiKey = IndexNowApiKeyManager::getKey();
+
+            // Register the route with the API key
+            $path = Str::of('/')->append($apiKey)->append('.txt')->toString();
+
+            Route::any($path, [IndexNowKeyController::class, 'show'])
+                ->name('indexnow_key_verification');
+
+            // Store API key in config so it can be accessed by the controller
+            config(['indexnow.current_api_key' => $apiKey]);
+
+        } catch (\Exception $e) {
+            LogManager::addMessage(
+                'Error registering IndexNow route: ' . $e->getMessage()
+            );
+        }
     }
 }
