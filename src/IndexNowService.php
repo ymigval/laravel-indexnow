@@ -86,7 +86,7 @@ class IndexNowService
      * @return array|string The result of the processing, either as an array or a string.
      * @throws MixedException
      */
-    public function submit(array|string $url = null): array|string
+    public function submit(array|string|null $url = null): array|string
     {
         if ($url !== null) {
             $this->setUrls($url);
