@@ -224,8 +224,9 @@ class IndexNowServiceTest extends TestCase
         $result = $service->submit('https://example.com/page');
 
         // Assert
-        $this->assertIsString($result);
-        $this->assertStringContainsString('temporarily blocked', $result);
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('status', $result);
+        $this->assertGreaterThan(399, (int) $result['status']);
     }
 
     #[Test] public function it_extracts_host_from_urls()

@@ -21,7 +21,7 @@ class LogManagerTest extends TestCase
         $this->originalLogPath = LogManager::getLogFilePath();
 
         // Create a temporary log path for testing
-        $this->testLogPath = storage_path('logs/indexnow_test.log');
+        $this->testLogPath = Config::get('indexnow.logging_path', storage_path('logs/indexnow_test.log'));
 
         // Set private static property using reflection
         $reflectionClass = new \ReflectionClass(LogManager::class);

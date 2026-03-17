@@ -40,6 +40,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Logging Path
+    |--------------------------------------------------------------------------
+    | Specifies the file path where IndexNow logs should be stored.
+    | By default, logs are stored in the Laravel storage/logs directory under the name index
+    | .log. You can customize this path to suit your application's logging structure.
+    |
+    | Default: storage/logs/indexnow.log
+    |
+    */
+
+    'logging_path' => env('INDEXNOW_LOGGING_PATH', storage_path('logs/indexnow.log')),
+
+    /*
+    |--------------------------------------------------------------------------
     | Enable Submissions
     |--------------------------------------------------------------------------
     |
