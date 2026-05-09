@@ -82,16 +82,15 @@ class IndexNowService
     /**
      * Processes the submission for the provided URLs and returns the result.
      *
-     * @param array|string|null $url The URL(s) to be processed. Can be a string, an array of strings, or null.
-     * @return array|string The result of the processing, either as an array or a string.
+     * @param array|string $url The URL(s) to be processed. Can be a string, an array of strings, or null.
+     * @return array The result of the processing, either as an array or a string.
+     * @throws ExcessUrlsException
      * @throws MixedException
+     * @throws NonAbsoluteUrlException
      */
-    public function submit(array|string $url = null): array|string
+    public function submit(array|string $url): array
     {
-        if ($url !== null) {
-            $this->setUrls($url);
-        }
-
+        $this->setUrls($url);
         $process = $this->process();
         LogManager::addMessage($process);
 
