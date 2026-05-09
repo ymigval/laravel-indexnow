@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use Ymigval\LaravelIndexnow\Exceptions\InvalidKeyException;
 use Ymigval\LaravelIndexnow\Exceptions\KeyFileDoesNotExistException;
 use Ymigval\LaravelIndexnow\IndexNowApiKeyManager;
+use Ymigval\LaravelIndexnow\IndexNowService;
 use Ymigval\LaravelIndexnow\LogManager;
 
 class CheckStatusCommand extends Command
@@ -274,7 +275,7 @@ class CheckStatusCommand extends Command
      */
     private function checkSubmissionsStatus(): void
     {
-        $submissionsEnabled = Config::get('indexnow.enable_submissions', false);
+        $submissionsEnabled = IndexNowService::enableSubmissions();
 
         $statusColor = $submissionsEnabled ? 'green' : 'yellow';
         $statusText = $submissionsEnabled ? 'Yes' : 'No';
@@ -368,7 +369,7 @@ class CheckStatusCommand extends Command
         try {
             // Check if all critical components are correctly configured
             $apiKey = IndexNowApiKeyManager::getKey();
-            $submissionsEnabled = Config::get('indexnow.enable_submissions', false);
+            $submissionsEnabled = IndexNowService::enableSubmissions();
             $configPath = config_path('indexnow.php');
             $configExists = File::exists($configPath);
 

@@ -20,7 +20,7 @@ return [
     |
     */
 
-    'search_engine' => 'indexnow',
+    'search_engine' => 'microsoft_bing',
 
     /*
     |--------------------------------------------------------------------------

@@ -2,6 +2,14 @@
 
 All notable changes to `ymigval/laravel-indexnow` will be documented in this file.
 
+## 4.0.0 - 2026-05-09
+
+### Changed
+
+- Changed default `search_engine` to `microsoft_bing` in configuration.
+- Refactored submission logic to use `IndexNowService::enableSubmissions()`.
+- Improved exception handling in `IndexNowService` processing.
+
 ## 3.0.1 - 2025-04-26
 
 ### Fixed

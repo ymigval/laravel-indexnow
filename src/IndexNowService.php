@@ -195,24 +195,24 @@ class IndexNowService
      * preventing spam, preparing URLs, and sending requests to the specified search engine.
      * Returns detailed information about the submission or an error message if processing fails.
      *
-     * @return array|string Returns an associative array containing details about the submission
+     * @return array Returns an associative array containing details about the submission
      *                      (search engine, response status, response info, and URLs) if successful,
      *                      or a string message indicating the reason for failure.
-     * @throws NonAbsoluteUrlException If any of the provided URLs are not absolute.
      * @throws ExcessUrlsException If the number of URLs exceeds the allowable limit.
      * @throws MixedException For general exceptions during the process execution.
+     * @throws NonAbsoluteUrlException If any of the provided URLs are not absolute.
      */
-    private function process(): array|string
+    private function process(): array
     {
-        if (! Config::get('indexnow.enable_submissions')) {
-            return 'Enable Submissions is set to false. To allow submissions, please check the configuration file and set it to true.';
-        }
-
-        if (!PreventSpam::isAllowed()) {
-            return 'The use of IndexNow has been temporarily blocked to prevent potential spam.';
-        }
-
         try {
+            if (!self::enableSubmissions()) {
+                throw new Exception('IndexNow submissions are currently disabled.');
+            }
+
+            if (!PreventSpam::isAllowed()) {
+                throw new Exception('You are temporarily blocked from submitting URLs to IndexNow.');
+            }
+
             $this->parseUrls();
             $urls = $this->getUrls();
 
@@ -222,7 +222,7 @@ class IndexNowService
             if (count($urls)) {
                 $response = Http::post((string)$endpoint, $this->buildRequestData());
             } else {
-                return 'No URLs provided for indexing.';
+                throw new Exception('No URLs provided for submission.');
             }
         } catch (NonAbsoluteUrlException|ExcessUrlsException $e) {
             throw $e;
@@ -242,5 +242,20 @@ class IndexNowService
             'info' => $response->reason(),
             'urls' => $urls,
         ];
+    }
+
+    /**
+     * Enables or verifies the status of submissions based on configuration settings.
+     *
+     * @return bool Returns true if submissions are enabled in the configuration; otherwise, false.
+     */
+    static public function enableSubmissions(): bool
+    {
+        $enableSubmissions = Config::get('indexnow.enable_submissions', false);
+
+        if (!is_bool($enableSubmissions))
+            return false;
+
+        return boolval($enableSubmissions);
     }
 }

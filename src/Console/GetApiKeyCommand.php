@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Config;
 use Ymigval\LaravelIndexnow\Exceptions\InvalidKeyException;
 use Ymigval\LaravelIndexnow\Exceptions\KeyFileDoesNotExistException;
 use Ymigval\LaravelIndexnow\IndexNowApiKeyManager;
+use Ymigval\LaravelIndexnow\IndexNowService;
 
 class GetApiKeyCommand extends Command
 {
@@ -107,7 +108,7 @@ class GetApiKeyCommand extends Command
      */
     private function showConfigStatus(): void
     {
-        $submissionsEnabled = Config::get('indexnow.enable_submissions', false);
+        $submissionsEnabled = IndexNowService::enableSubmissions();
         $message = $submissionsEnabled
             ? self::MESSAGES['config_enabled']
             : self::MESSAGES['config_disabled'];
