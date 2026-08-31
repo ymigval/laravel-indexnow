@@ -35,7 +35,7 @@ class LogManager
      */
     public static function getLogFilePath(): string
     {
-        return self::$logFilePath;
+        return Config::get('indexnow.logging_path', self::$logFilePath);
     }
 
     /**
